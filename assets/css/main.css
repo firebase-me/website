@@ -5,7 +5,7 @@ html, body {
     padding: 0;
 }
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Raleway', sans-serif;
     display: flex;
     flex-direction: column;
 }
@@ -14,4 +14,113 @@ body {
     flex: 1;
     width: 100%;
     overflow-y:auto;
+    background-image: url('/assets/images/background.jpg');
+    background-color: #ffa100;
+    /* background-size:1586px 1013px;  */
+    background-position:center;
+    background-repeat:no-repeat;
+    position: relative; /* Ensure the container is positioned relative to its pseudo-element */
+    z-index: 1; /* Ensure the content stays above the pseudo-element */
+}
+/* .container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/assets/images/vignette.jpg'); 
+    background-size: cover; 
+    background-repeat: no-repeat;
+    mix-blend-mode: overlay; 
+    pointer-events: none; 
+    z-index: -1; 
+} */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;    
+    border-top: 2px solid orangered;
+}
+a {
+    color: #ffa100;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:visited {
+    color: #ffa100;
+}
+
+a:hover {
+    color: #fa4f16;
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+    margin: 10px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    min-width: 12rem;
+}
+
+main h2 {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+main .content-body {
+    background-color: #f1f1f1;
+    padding: 20px;
+}
+
+main .breadcrumb {
+    margin-bottom: 10px;
+}
+
+main .code-block {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap; /* Prevents text from wrapping */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
