@@ -10,6 +10,7 @@
 
             .sidebar {
                 width: 100%;
+                min-width: none;
                 height: auto;
                 display: none;
                 /* Hide sidebar by default */
