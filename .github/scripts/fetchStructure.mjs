@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/rest";
 import fs from 'fs';
-import path from 'path';
 import yaml from 'js-yaml';
 
 const octokit = new Octokit({
@@ -22,6 +21,7 @@ if (!owner || !repo) {
 }
 
 const pathToFolder = 'pages';  // Update the directory to 'pages'
+const branch = 'main';  // Adjust the branch name if necessary
 
 async function fetchFolderStructure() {
     const result = [];
@@ -113,15 +113,65 @@ async function fetchFolderStructure() {
         });
     }
 
-
     const filePath = 'structure.json';
-    // Delete the old structure.json if it exists
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-    }
+    // Write the new structure.json
     fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
 
     console.log('structure.json generated successfully');
+    await commitFileToRepo(filePath);
+}
+
+async function commitFileToRepo(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const message = 'Update structure.json';
+    const { data: refData } = await octokit.git.getRef({
+        owner,
+        repo,
+        ref: `heads/${branch}`
+    });
+    const latestCommitSha = refData.object.sha;
+
+    const { data: commitData } = await octokit.git.getCommit({
+        owner,
+        repo,
+        commit_sha: latestCommitSha
+    });
+
+    const { data: blobData } = await octokit.git.createBlob({
+        owner,
+        repo,
+        content: Buffer.from(content).toString('base64'),
+        encoding: 'base64'
+    });
+
+    const { data: treeData } = await octokit.git.createTree({
+        owner,
+        repo,
+        base_tree: commitData.tree.sha,
+        tree: [{
+            path: filePath,
+            mode: '100644',
+            type: 'blob',
+            sha: blobData.sha
+        }]
+    });
+
+    const { data: newCommitData } = await octokit.git.createCommit({
+        owner,
+        repo,
+        message,
+        tree: treeData.sha,
+        parents: [latestCommitSha]
+    });
+
+    await octokit.git.updateRef({
+        owner,
+        repo,
+        ref: `heads/${branch}`,
+        sha: newCommitData.sha
+    });
+
+    console.log('structure.json committed successfully');
 }
 
 fetchFolderStructure().catch(err => console.error(err));

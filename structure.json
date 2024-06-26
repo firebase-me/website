@@ -5,12 +5,6 @@
     "type": "dir",
     "children": [
       {
-        "name": "overview.md",
-        "path": "pages/services/overview.md",
-        "type": "file",
-        "children": []
-      },
-      {
         "name": "build",
         "type": "category",
         "children": [
@@ -19,6 +13,25 @@
             "path": "pages/services/authentication",
             "type": "dir",
             "children": [
+              {
+                "name": "blocking_functions",
+                "path": "pages/services/authentication/blocking_functions",
+                "type": "dir",
+                "children": [
+                  {
+                    "name": "before_sign_in.md",
+                    "path": "pages/services/authentication/blocking_functions/before_sign_in.md",
+                    "type": "file",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "name": "custom_claims.md",
+                "path": "pages/services/authentication/custom_claims.md",
+                "type": "file",
+                "children": []
+              },
               {
                 "name": "custom_tokens.md",
                 "path": "pages/services/authentication/custom_tokens.md",
@@ -92,25 +105,6 @@
                 "path": "pages/services/firestore/firestore_writes.md",
                 "type": "file",
                 "children": []
-              },
-              {
-                "name": "placeholder.md",
-                "path": "pages/services/firestore/placeholder.md",
-                "type": "file",
-                "children": []
-              },
-              {
-                "name": "security_rules",
-                "path": "pages/services/firestore/security_rules",
-                "type": "dir",
-                "children": [
-                  {
-                    "name": "placeholder.md",
-                    "path": "pages/services/firestore/security_rules/placeholder.md",
-                    "type": "file",
-                    "children": []
-                  }
-                ]
               }
             ]
           }
@@ -132,14 +126,21 @@
         "children": []
       },
       {
-        "name": "create_folders.js",
-        "path": "pages/services/create_folders.js",
-        "type": "file",
-        "children": []
+        "name": "cloud_function",
+        "path": "pages/services/cloud_function",
+        "type": "dir",
+        "children": [
+          {
+            "name": "manage_functions.md",
+            "path": "pages/services/cloud_function/manage_functions.md",
+            "type": "file",
+            "children": []
+          }
+        ]
       },
       {
-        "name": "map.yml",
-        "path": "pages/services/map.yml",
+        "name": "overview.md",
+        "path": "pages/services/overview.md",
         "type": "file",
         "children": []
       }
@@ -216,6 +217,25 @@
           {
             "name": "Cloud_Messaging.md",
             "path": "pages/tutorials/ios-swift/Cloud_Messaging.md",
+            "type": "file",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "misc",
+        "path": "pages/tutorials/misc",
+        "type": "dir",
+        "children": [
+          {
+            "name": "code_snippets.md",
+            "path": "pages/tutorials/misc/code_snippets.md",
+            "type": "file",
+            "children": []
+          },
+          {
+            "name": "common_tools.md",
+            "path": "pages/tutorials/misc/common_tools.md",
             "type": "file",
             "children": []
           }
