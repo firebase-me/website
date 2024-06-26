@@ -5,6 +5,12 @@
     "type": "dir",
     "children": [
       {
+        "name": "overview.md",
+        "path": "pages/services/overview.md",
+        "type": "file",
+        "children": []
+      },
+      {
         "name": "build",
         "type": "category",
         "children": [

@@ -26,12 +26,8 @@
     <meta name="twitter:url" content="https://firebase.me">
 
     <!-- Other Meta Tags -->
-    <meta name="author" content="Your Name">
+    <meta name="author" content="Firebase Me">
     <meta name="keywords" content="Firebase, Firebase tutorials, Firebase guides, app development, Firebase updates">
-
-    <!-- Other Meta Tags -->
-    <meta name="author" content="Your Name">
-    <meta name="keywords" content="keyword1, keyword2, keyword3">
 
     <!-- Canonical Link -->
     <link rel="canonical" href="https://firebase.me">
@@ -44,6 +40,7 @@
     <link id="navbar-styles" rel="stylesheet" href="/assets/css/navbar.css">
     <link id="footer-styles" rel="stylesheet" href="/assets/css/footer.css">
     <link id="mobile-styles" rel="stylesheet" href="/assets/css/mobile.css">
+    <link id="markdown-styles" rel="stylesheet" href="/assets/css/markdown.css">
     <link id="theme-link" rel="stylesheet" href="/assets/css/default.css">
 
     <link
@@ -80,7 +77,7 @@
 
         <main id="content">
             <h2 id="document-title" style="margin-bottom: 0px;"></h2>
-            <div class="content-body" id="markdown-content">
+            <div class="content-body" id="content-body">
                 <!-- Markdown content will be loaded here -->
             </div>
         </main>
@@ -88,7 +85,7 @@
     <footer>
         <p>Connect with community and official channels from our <a href="#" onclick="goto('contact')">Contact Page</a>
         </p>
-        <p><a href="#" onclick="goto('policy')">Privacy Policy</a></p>
+        <p><a href="#" onclick="goto('privacy')">Privacy Policy</a></p>
     </footer>
     <!-- Theme selection dialog -->
     <div id="theme-dialog" class="theme-dialog">
@@ -100,191 +97,18 @@
             </div>
         </div>
     </div>
+    <script>
+        var jsonData = [];
+        var category = null;
+        var current = null;
+    </script>
     <!-- end page content, start scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/3.0.2/marked.min.js"></script>
-    <!-- <script src="assets/utils.js"></script>
-    <script src="assets/markparse.js"></script>
-    <script src="assets/navigation.js"></script>
-    <script src="assets/script.js"></script> -->
-    <script src="assets/redirect.js"></script>
-
-    <script>
-        let jsonData;
-        const approvedFiles = ['md'];
-
-        // Function to generate the header buttons from root items in JSON
-        function generateCategories(data) {
-            const headerButtons = document.getElementById('category-list');
-            headerButtons.innerHTML = ''; // Clear existing buttons
-            data.forEach((item, index) => {
-                const button = document.createElement('button');
-                button.textContent = item.name;
-                button.addEventListener('click', () => {
-                    switchNavContent(index);
-                });
-                headerButtons.appendChild(button);
-            });
-        }
-
-        // Function to switch the content in the navbar based on the selected header tab
-        function switchNavContent(index) {
-            const selectedData = jsonData[index].children;
-            const navbar = document.getElementById('navbar');
-            navbar.innerHTML = '';
-            generateNavbar(selectedData, navbar);
-        }
-
-        // Function to generate the navbar HTML based on JSON data
-        function generateNavbar(data, parentElement, depth = 0) {
-            data.forEach(item => {
-                if (item.type === "category" || item.type === "dir") {
-                    const btn = document.createElement("button");
-                    btn.className = `dropdown-btn ${item.children.length ? 'has-children' : 'no-children'}`;
-                    btn.textContent = sanitizeName(item.name);
-                    btn.style.paddingLeft = `${16 + depth * 12}px`;
-
-                    if (item.children.length) {
-                        btn.addEventListener("click", function () {
-                            this.classList.toggle("open");
-                            const dropdownContent = this.nextElementSibling;
-                            if (dropdownContent) {
-                                dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-                            }
-                        });
-
-                        const dropdownContainer = document.createElement("div");
-                        dropdownContainer.className = "dropdown-container";
-                        parentElement.appendChild(btn);
-                        parentElement.appendChild(dropdownContainer);
-                        generateNavbar(item.children, dropdownContainer, depth + 1);
-                    } else {
-                        parentElement.appendChild(btn);
-                    }
-                } else if (item.type === "file") {
-                    const fileExtension = item.name.split('.').pop();
-                    if (approvedFiles.includes(fileExtension)) {
-                        const link = document.createElement("a");
-                        link.textContent = sanitizeName(item.name);
-                        link.className = 'file-link';
-                        link.style.paddingLeft = `${16 + depth * 12}px`;
-                        link.addEventListener("click", function () {
-                            console.log(item.path);
-                            generateRandomCrumbs();
-                            const allLinks = document.querySelectorAll('.navbar a, .navbar button');
-                            allLinks.forEach(link => link.classList.remove('selected', 'selected-file'));
-                            this.classList.add('selected', 'selected-file');
-                            let parent = this.parentElement;
-                            while (parent && parent.classList.contains('dropdown-container')) {
-                                const siblingButton = parent.previousElementSibling;
-                                if (siblingButton) {
-                                    siblingButton.classList.add('selected');
-                                }
-                                parent = parent.parentElement;
-                            }
-                        });
-                        parentElement.appendChild(link);
-                    }
-                }
-            });
-        }
-
-        function sanitizeName(input) {
-            const baseName = input.replace(/\.(md)$/i, '');
-            // const baseName = input.replace(/\.(html|md|js|yaml|yml|json)$/i, '');
-            const withSpaces = baseName.replace(/[_-]/g, ' ');
-
-            // List of filler words to exclude from capitalization
-            const fillerWords = ['in', 'of', 'the', 'and', 'a', 'to', 'for', 'with'];
-
-            const words = withSpaces.split(' ');
-            const formattedWords = words.map((word, index) => {
-                if (index === 0 || !fillerWords.includes(word.toLowerCase())) {
-                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                }
-                return word.toLowerCase();
-            });
-            return formattedWords.join(' ');
-        }
-
-        // Function to generate random crumbs for crumbtray
-        function generateRandomCrumbs() {
-            const crumbs = document.getElementById('crumbtray');
-            crumbs.innerHTML = ''; // Clear existing items
-            const itemCount = Math.floor(Math.random() * 11); // Random number of items between 0 and 10
-            if (itemCount > 0) {
-                crumbs.classList.add('has-content');
-            } else {
-                crumbs.classList.remove('has-content');
-            }
-            for (let i = 0; i < itemCount; i++) {
-                const button = document.createElement('button');
-                button.textContent = `Anchor ${i + 1}`;
-                button.addEventListener('click', () => highlightActiveCrumb(button));
-                crumbs.appendChild(button);
-            }
-        }
-
-        // Toggle the visibility of the sidebar on mobile
-        function toggleNav() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
-
-        // Handle active crumb highlighting
-        function highlightActiveCrumb(button) {
-            const allCrumbs = document.querySelectorAll('.crumbs button');
-            allCrumbs.forEach(crumb => crumb.classList.remove('active'));
-            button.classList.add('active');
-        }
-
-        // Fetch the JSON data and initialize the navbar and header
-        fetch('/structure.json')
-            .then(response => response.json())
-            .then(data => {
-                jsonData = data;
-                generateCategories(data);
-                switchNavContent(0); // Display the first tab's content by default
-            })
-            .catch(error => console.error('Error loading JSON:', error));
-
-        // Function to show the theme dialog
-        function showThemeDialog() {
-            document.getElementById('theme-dialog').style.display = 'block';
-            loadThemes();
-        }
-        function changeTheme(asset) {
-            const themeLink = document.getElementById('theme-link');
-            themeLink.href = asset;
-            closeThemeDialog();
-        }
-        // Function to close the theme dialog
-        function closeThemeDialog() {
-            document.getElementById('theme-dialog').style.display = 'none';
-        }
-
-        function loadThemes() {
-            fetch('/themes.json')
-                .then(response => response.json())
-                .then(data => {
-                    const themeList = document.getElementById('theme-list');
-                    themeList.innerHTML = ''; // Clear existing themes
-                    data.forEach(theme => {
-                        const button = document.createElement('button');
-                        button.textContent = `${theme.name} by ${theme.creator}`;
-                        button.onclick = () => changeTheme(theme.asset);
-                        themeList.appendChild(button);
-                    });
-                })
-                .catch(error => console.error('Error loading themes:', error));
-        }
-    </script>
-    <script>
-        window.addEventListener('scroll', function () {
-            const scrolled = window.scrollY;
-            const background = document.querySelector('.container');
-            background.style.backgroundPosition = `center ${scrolled * 4}px`;
-        });</script>
+    <script src="/assets/utils.js"></script>
+    <script src="/assets/markparse.js"></script>
+    <script src="/assets/navigation.js"></script>
+    <script src="/assets/redirect.js"></script>
 </body>
 
 </html>

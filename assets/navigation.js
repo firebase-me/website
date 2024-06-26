@@ -1,6 +1,5 @@
-// navigation handles all click events and the navigation stack
-// when the user clicks a link, we update the location
-// redirect.js will handle the content
+const approvedFiles = ['md'];
+
 function goto(dest, stub = false) {
     if (window.location.hostname === 'localhost') {
         if (dest == '/' || dest == 'home')
@@ -9,96 +8,252 @@ function goto(dest, stub = false) {
     const loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
     // this triggers redirect to load the page content
     if (stub) {
-        history.pushState(null, window.location.hostname, loc);
+        // history.pushState(null, window.location.hostname, loc);
     }
     else {
-        history.pushState(null, window.location.hostname, '/' + loc);
+        // history.pushState(null, window.location.hostname, '/' + loc);
+    }
+    const source = findSource(dest)
+    current = source;
+    loadContent(source);    
+    clearNavHighlights();
+}
+
+function findCategory(path) {
+    
+    const cat = jsonData.find(i => path.startsWith(i.path))
+    console.log('FIND CAT', path, cat)
+    return cat;
+}
+function findSource(path) {
+    console.log("Find Source", path, typeof path)
+    if (path && path.endsWith('.md'))
+        return path;
+    let source;
+    switch (path) {
+        case 'privacy': source = 'assets/privacy.md'; break;
+        case 'contact': source = 'assets/contact.md'; break;
+        case '404': source = 'assets/404.md'; break;
+        case 'markdown': source = 'assets/markdown.md'; break;
+        case '':
+        case 'home':
+        case 'index.html':
+        case null: source = 'assets/welcome.md'; break;
+        default:
+            source = `pages/${path}.md`
+            break;
+    }
+    if (!source) throw new Error("No source found for path: " + path);
+    return source.replace('//', '/');
+}
+
+// Function to get query parameters from the URL
+function getQueryParams() {
+    const params = {};
+    const queryString = window.location.search.substring(1);
+    const queryArray = queryString.split('&');
+    queryArray.forEach(query => {
+        const [key, value] = query.split('=');
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+    return params;
+}
+
+// Function to generate categories for header buttons
+function generateCategories(data, priority) {
+    const headerButtons = document.getElementById('category-list');
+    headerButtons.innerHTML = ''; // Clear existing buttons
+    for (const item of data) {
+        const button = document.createElement('button');
+        button.textContent = item.name;
+        button.addEventListener('click', () => {
+            switchCategory(item.children, item.name);
+        });
+        headerButtons.appendChild(button);
+        if (category == null || (priority && priority === item.name)) {
+            category = item.name;
+            switchCategory(item.children, item.name);
+        }
     }
 }
-document.addEventListener("DOMContentLoaded", function () {
-    fetch('structure.json')
-        .then(response => {
-            if (!response.ok)
-                throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (Array.isArray(data)) {
-                populateCategories(data);
-                const initialCategory = data[0];
-                if (initialCategory && initialCategory.children) {
-                    populateNavigation(initialCategory.children);
-                }
-            }
-        })
-        .catch(error => console.error('Error loading structure.json:', error));
 
-    function populateCategories(data) {
-        const categoryList = document.getElementById('category-list');
-        categoryList.innerHTML = '';
-        data.forEach(category => {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = category.name;
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                populateNavigation(category.children);
-            });
-            categoryList.appendChild(link);
-        });
+// Function to switch the content in the navbar based on the selected header tab
+function switchCategory(data, source) {
+    const navbar = document.getElementById('navbar');
+    navbar.innerHTML = ''; // Clear existing content
+    generateNavbar(data, navbar);
+    console.log("CHANGING CATEGORY", category, source, current)
+    if (typeof current === 'string' && category == source) {
+        highlightNavPath()
     }
+}
 
-    function populateNavigation(children) {
-        const navList = document.getElementById('subject-list');
-        navList.innerHTML = '';
-        children.forEach(child => {
-            const listItem = createNavItem(child);
-            navList.appendChild(listItem);
-        });
+// Function to generate the navbar HTML based on JSON data
+function generateNavbar(data, parentElement, depth = 0) {
+    // Limit the depth to prevent infinite recursion
+    if (depth > 20) {
+        console.warn('Maximum depth exceeded', data);
+        return;
     }
+    for (const item of data) {
+        if (item.type === "category" || item.type === "dir") {
+            const btn = document.createElement("button");
+            btn.className = `dropdown-btn ${item.children.length ? 'has-children' : 'no-children'}`;
+            btn.textContent = sanitizeName(item.name);
+            btn.style.paddingLeft = `${16 + depth * 12}px`;
+            btn.setAttribute('data-path', item.path); // Add data-path attribute
 
-    function createNavItem(item) {
-        const listItem = document.createElement('li');
-        switch (item.type) {
-            case 'dir':
-            case 'category':
-
-                const span = document.createElement('span');
-                span.classList.add('nav-item');
-                span.textContent = formatFileName(item.name);
-                span.addEventListener('click', function () {
-                    listItem.classList.toggle('active');
-                    const childList = listItem.querySelector('ul');
-                    if (childList) {
-                        childList.classList.toggle('hidden');
+            if (item.children.length) {
+                btn.addEventListener("click", function () {
+                    this.classList.toggle("open");
+                    const dropdownContent = this.nextElementSibling;
+                    if (dropdownContent) {
+                        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
                     }
                 });
-                listItem.appendChild(span);
-                if (item.children) {
-                    const childList = document.createElement('ul');
-                    childList.classList.add('submenu', 'hidden');
-                    item.children.forEach(child => {
-                        const childItem = createNavItem(child);
-                        childList.appendChild(childItem);
-                    });
-                    listItem.appendChild(childList);
-                }
-                break;
-            case 'file':
-                const link = document.createElement('a');
-                
-                link.href = '#';
-                link.textContent = formatFileName(item.name);
-                link.addEventListener('click', function (event) {
-                    // event.preventDefault();
-                    goto(item.path)
-                });
-                listItem.appendChild(link);
-                break;
 
-            default:
-                break;
+                const dropdownContainer = document.createElement("div");
+                dropdownContainer.className = "dropdown-container";
+                parentElement.appendChild(btn);
+                parentElement.appendChild(dropdownContainer);
+                generateNavbar(item.children, dropdownContainer, depth + 1);
+            } else {
+                parentElement.appendChild(btn);
+            }
+        } else if (item.type === "file") {
+            const fileExtension = item.name.split('.').pop();
+            if (approvedFiles.includes(fileExtension)) {
+                const link = document.createElement("a");
+                link.textContent = sanitizeName(item.name);
+                link.className = 'file-link';
+                link.style.paddingLeft = `${16 + depth * 12}px`;
+                link.setAttribute('data-path', item.path); // Add data-path attribute
+                link.addEventListener("click", function () {
+                    console.log("ITEM CLICK", item.path);
+                    const allLinks = document.querySelectorAll('.navbar a, .navbar button');
+                    for (const link of allLinks) {
+                        link.classList.remove('selected', 'selected-file');
+                    }
+                    this.classList.add('selected', 'selected-file');
+                    let parent = this.parentElement;
+                    while (parent && parent.classList.contains('dropdown-container')) {
+                        const siblingButton = parent.previousElementSibling;
+                        if (siblingButton) {
+                            siblingButton.classList.add('selected');
+                        }
+                        parent = parent.parentElement;
+                    }
+                    // open content
+                    console.log("NAV 1", item, category)
+
+                    current = item.path;
+                    loadContent(this.getAttribute('data-path'))
+                });
+                parentElement.appendChild(link);
+            }
         }
-        return listItem;
     }
-});
+}
+
+
+
+function clearNavHighlights() {
+    document.querySelectorAll('.selected, .selected-file').forEach(btn => {
+        btn.classList.remove('selected', 'selected-file');
+    });
+}
+// Function to initialize the selection based on the query parameter
+function highlightNavPath() {
+    clearNavHighlights()
+    if (!current) return;
+    const newcat = findCategory(current)
+    const source = findSource(current);
+
+    if (!newcat) {
+        loadContent(source)
+        return;
+    }
+    else {
+        // history.replaceState(null, 'Firebase Me: ' + paths[paths.length - 1], '/' + paths.join('/'))
+    }
+
+    // find target button and iterate through parents
+    const target = findNavButtonByPath(current)
+
+    console.log("HIGHLIGHT NAV TARGET", target)
+    // FIXME: known issue
+    // 1. if you pick a nav item
+    // 2. change the category
+    // 3. pick another item
+    // 4. and change the category again
+    // 5. target == undefined
+    // why? no idea.
+    if(target)
+    target.classList.add('selected', 'selected-file');
+    let parent = target.parentElement;
+    while (parent && parent.classList.contains('dropdown-container')) {
+        const siblingButton = parent.previousElementSibling;
+        if (siblingButton) {
+            siblingButton.classList.add('selected', 'open');
+        }
+        parent.style.display = "block";
+        parent = parent.parentElement;
+    }
+    // trigger content
+    console.log("NAV current")
+    loadContent(current)
+        .finally(() => console.log("rehydrated and loaded document"));
+
+}
+
+// Function to find a button with a specific data-path in the navbar
+function findNavButtonByPath(path) {
+    const navButtons = document.querySelectorAll('#navbar button, #navbar a');
+    for (const button of navButtons) {
+        if (button.getAttribute('data-path') === path) {
+            return button;
+        }
+    }
+    return null; // Return null if no button with the matching data-path is found
+}
+
+// Function to generate random crumbs for crumbtray
+
+
+// Toggle the visibility of the sidebar on mobile
+function toggleNav() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+// Handle active crumb highlighting
+function highlightActiveCrumb(button) {
+    const allCrumbs = document.querySelectorAll('.crumbs button');
+    for (const crumb of allCrumbs) {
+        crumb.classList.remove('active');
+    }
+    button.classList.add('active');
+}
+function generateCrumbs(newCrumbs) {
+    const crumbs = document.getElementById('crumbtray');
+    crumbs.innerHTML = ''; // Clear existing items
+
+    if (!newCrumbs || newCrumbs.length === 0) {
+        crumbs.classList.remove('has-content');
+        return;
+    }
+
+    crumbs.classList.add('has-content');
+
+    for (const crumb of newCrumbs) {
+        const button = document.createElement('button');
+        button.textContent = crumb.label;
+        button.addEventListener('click', function () {
+            document.querySelectorAll('#crumbtray button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(crumb.crumbId).scrollIntoView({ behavior: 'smooth' });
+        });
+        crumbs.appendChild(button);
+    }
+
+}
