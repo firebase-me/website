@@ -14,6 +14,12 @@
             "type": "dir",
             "children": [
               {
+                "name": "blocking_functions",
+                "path": "pages/services/authentication/blocking_functions",
+                "type": "dir",
+                "children": []
+              },
+              {
                 "name": "custom_claims.md",
                 "path": "pages/services/authentication/custom_claims.md",
                 "type": "file",
@@ -124,6 +130,12 @@
             "children": []
           }
         ]
+      },
+      {
+        "name": "overview.md",
+        "path": "pages/services/overview.md",
+        "type": "file",
+        "children": []
       }
     ]
   },

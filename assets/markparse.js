@@ -1,52 +1,54 @@
 let currentLanguage = 'js'; // Default language
 
-async function loadMarkdown(url) {
+async function loadContent(url) {
+    console.log("Loading content 1:", url)
     let text = ''
-    if(!url.startsWith('http')) url = `${window.location.origin}/${url}`
+    if (!url.startsWith('http')) url = `${window.location.origin}/${url}`
+    console.log("Loading content 2:", url)
     try {
         const response = await fetch(url);
         if (response.ok) {
+            console.log("Loading content 3 :", "OK")
             text = await response.text();
         } else {
+            console.log("Loading content 4:", "ERROR")
             throw new Error('Not found');
         }
     } catch (_error) {
         try {
+            console.log("Loading content 55:", "404")
             const response = await fetch('assets/404.md');
             if (response.ok) {
+                console.log("Loading content: 6", "OK 404")
                 text = await response.text();
             } else {
+                console.log("Loading content: 7", "ERROR FATAL")
                 throw new Error('Not found');
             }
         } catch (_error) {
+            console.log("Loading content:8", "FINAL ERROR")
             text = "# Not Found\n # 404\n _resources not found_";
         }
     }
-    return text;
+    renderMarkdown(text, url);
 }
-function renderMarkdown(input, url,update) {
+function renderMarkdown(input, url, update) {
+    // Sanitize content for reader
+    console.log("RENDER", url)
     let text = input ? input : '';
-    // window.history.replaceState(null, '', window.location.origin);
-    if (!input && url) {
-        loadMarkdown(url).then(markdownText => {
-            text = markdownText;
-            renderMarkdown(text,url,update);
-        }).catch(error => {
-            console.error('Error loading markdown:', error);
-        });
-        return;
-    }
+    // if (url)
+    //     window.history.replaceState(null, 'Firebase Me: ', window.location.origin);
 
-    if(update){
+    if (update) {
         // Update the URL without reloading the page
         const relativePath = url.match(/pages\/(.+)\.md/)[1];
         console.log("PATH", relativePath)
         const newUrl = `${window.location.origin}/${relativePath}`;
-        window.history.replaceState(null, '', newUrl);
+        // window.history.replaceState(null, '', newUrl);
     }
 
-    const container = document.getElementById('markdown-content');
     const titleContainer = document.getElementById('document-title');
+    const container = document.getElementById('content-body');
 
     // Extract and set the document title, ensuring it's the first # in the document
     const titleMatch = text.match(/^#\s(.+)/m);
@@ -91,29 +93,24 @@ function renderMarkdown(input, url,update) {
         }
     });
 
-    // Generate TOC from custom anchors
-    const tocContainer = document.querySelector('.tocs');
-    tocContainer.innerHTML = '';
+    // FIND Crumbs from custom anchors
+    console.log("ADDING CRUMBS")
+    const tocContainer = document.querySelector('.crumbs');
     const crumbRegex = /{{crumb:([^}]+)}}/g;
+    const crumbs = [];
 
     let match;
+
     while ((match = crumbRegex.exec(text)) !== null) {
         const label = match[1].trim();
         const crumbId = label.toLowerCase().replace(/\s+/g, '-');
-        const crumbLink = document.createElement('a');
-        crumbLink.href = `#${crumbId}`;
-        crumbLink.textContent = label;
-        crumbLink.addEventListener('click', function () {
-            document.querySelectorAll('.toc li a').forEach(a => a.classList.remove('active'));
-            crumbLink.classList.add('active');
-        });
-        const listItem = document.createElement('li');
-        listItem.appendChild(crumbLink);
-        tocContainer.appendChild(listItem);
-
+        crumbs.push({ label, crumbId, match: match[0] });
+    }
+    generateCrumbs(crumbs);
+    for (const crumb of crumbs) {
         const anchorElement = document.createElement('a');
-        anchorElement.id = crumbId;
-        container.innerHTML = container.innerHTML.replace(match[0], anchorElement.outerHTML);
+        anchorElement.id = crumb.crumbId;
+        container.innerHTML = container.innerHTML.replace(crumb.match, anchorElement.outerHTML);
     }
 
     // Highlight code blocks

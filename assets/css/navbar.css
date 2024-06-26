@@ -1,12 +1,12 @@
 
 .sidebar {
-    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
     background-color: #333;
     color: white;
     display: flex;
     flex-direction: column;
-    /* random theme? */
-    border-right: 2px solid orangered;
+    border-right: 2px solid gold;
 }
 
 
@@ -17,6 +17,7 @@
     /* Default height when empty */
     overflow-y: scroll;
     transition: height 0.5s ease;
+    border-bottom: 2px solid gold;
 }
 
 .crumbs.has-content {

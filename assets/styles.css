@@ -38,11 +38,6 @@ header .title {
     align-items: center;
 }
 
-header .title {
-    display: flex;
-    align-items: center;
-}
-
 .home-link a {
     color: #fff;
 }
@@ -58,7 +53,7 @@ header .categories a {
 .container {
     display: flex;
     flex: 1;
-    background-image: url('/assets/images/background.jfif');
+    background-image: url('/assets/images/background.jpg');
     background-color: #ffa100;
     background-size: cover; /* or 'contain' */
     background-position: center;
