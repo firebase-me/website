@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/rest";
 import fs from 'fs';
-import path from 'path';
 import yaml from 'js-yaml';
 
 const octokit = new Octokit({
@@ -22,6 +21,7 @@ if (!owner || !repo) {
 }
 
 const pathToFolder = 'pages';  // Update the directory to 'pages'
+const branch = 'main';  // Adjust the branch name if necessary
 
 async function fetchFolderStructure() {
     const result = [];
@@ -95,33 +95,4 @@ async function fetchFolderStructure() {
             if (item.type === 'file' && item.name.endsWith('.md')) {
                 const node = {
                     name: item.name,
-                    path: item.path,
-                    type: item.type,
-                    children: []
-                };
-                parent.push(node);
-            } else if (item.type === 'dir') {
-                const node = {
-                    name: item.name,
-                    path: item.path,
-                    type: item.type,
-                    children: []
-                };
-                parent.push(node);
-                stack.push({ path: item.path, parent: node.children });
-            }
-        });
-    }
-
-
-    const filePath = 'structure.json';
-    // Delete the old structure.json if it exists
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-    }
-    fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
-
-    console.log('structure.json generated successfully');
-}
-
-fetchFolderStructure().catch(err => console.error(err));
+                    p
