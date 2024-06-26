@@ -17,7 +17,14 @@
                 "name": "blocking_functions",
                 "path": "pages/services/authentication/blocking_functions",
                 "type": "dir",
-                "children": []
+                "children": [
+                  {
+                    "name": "before_sign_in.md",
+                    "path": "pages/services/authentication/blocking_functions/before_sign_in.md",
+                    "type": "file",
+                    "children": []
+                  }
+                ]
               },
               {
                 "name": "custom_claims.md",
