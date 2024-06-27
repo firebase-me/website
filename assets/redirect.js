@@ -14,9 +14,16 @@ fetch('/structure.json')
         const target = params.path ? params.path : "home";
         const cat = findCategory(target)
         current = findSource(target);
+        console.info("REDIRECT", target, cat, current)
         category = cat ? cat.name : jsonData[0].name;
-        generateCategories(data, category);
-        
+        console.info("REDIRECT", target, cat, current)
+        generateCategories(data);
+
+        // if (cat) {
+        //     switchCategory(cat.children, cat.name)
+        //     console.warn("REDIRECT CAT", cat)
+        // }
+
         goto(target)
 
         // // handle in the case of 404 redirects

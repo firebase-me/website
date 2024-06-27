@@ -5,20 +5,26 @@ function goto(dest, stub = false) {
         if (dest == '/' || dest == 'home')
             dest = 'index.html'
     }
-    const loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
+
+    let loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
+    if(!loc.startsWith('/')){
+        loc = '/' + loc;
+    }if (loc.endsWith('/')) {
+        loc = loc.slice(0, -1);
+    }
     // this triggers redirect to load the page content
-    console.log("GOTO:", loc, )
-    if(!window.location.origin.includes('localhost')){
-    if (stub) {
-        history.pushState(null, window.location.hostname, loc);
+    console.log("GOTO:", loc,)
+    if (window.location.origin.includes('localhost')) {
+        console.error("GOTO", "LOCALHOST", loc)
+        // history.replaceState(null, '', window.location.origin+ loc);
+        history.pushState(null, '',  window.location.origin+ loc);
     }
     else {
-        history.pushState(null, window.location.hostname, '/' + loc);
-    }}
-    else {
-        history.replaceState(null, window.location.hostname, loc);
+        history.pushState(null, '',  window.location.origin+ loc);
     }
     const source = findSource(dest)
+    const cat = findCategory(source)
+    console.log("GOTO2",source, cat)
     current = source;
     loadContent(source);
     highlightNavPath();
@@ -27,8 +33,8 @@ function goto(dest, stub = false) {
 function findCategory(path) {
     const values = path.split('/')
 
-    let cat = jsonData.find(i => i.name === values[0])
-    console.log('FIND CAT', path, cat)
+    let cat = jsonData.find(i => i.name === (values[0]?values[0]:values[1]))
+    console.log('FIND CAT', path, cat, values)
     return cat;
 }
 
@@ -109,7 +115,7 @@ function generateNavbar(data, parentElement, depth = 0) {
     for (const item of data) {
         if (item.type === "category" || item.type === "dir") {
             const btn = document.createElement("button");
-            btn.className = `dropdown-btn ${item.children.length ? 'has-children' : 'no-children'}`;
+            btn.className = `dropdown-btn ${item.children.length ? 'has-children' : 'no-children'} non-selectable`;
             btn.textContent = sanitizeName(item.name);
             btn.style.paddingLeft = `${16 + depth * 12}px`;
             btn.setAttribute('data-path', item.path); // Add data-path attribute
@@ -136,30 +142,12 @@ function generateNavbar(data, parentElement, depth = 0) {
             if (approvedFiles.includes(fileExtension)) {
                 const link = document.createElement("a");
                 link.textContent = sanitizeName(item.name);
-                link.className = 'file-link';
+                link.className = 'file-link non-selectable';
                 link.style.paddingLeft = `${16 + depth * 12}px`;
                 link.setAttribute('data-path', item.path); // Add data-path attribute
                 link.addEventListener("click", function () {
                     console.log("ITEM CLICK", item.path);
                     current = item.path
-                    // const allLinks = document.querySelectorAll('.navbar a, .navbar button');
-                    // for (const link of allLinks) {
-                    //     link.classList.remove('selected', 'selected-file');
-                    // }
-                    // this.classList.add('selected', 'selected-file');
-                    // let parent = this.parentElement;
-                    // while (parent && parent.classList.contains('dropdown-container')) {
-                    //     const siblingButton = parent.previousElementSibling;
-                    //     if (siblingButton) {
-                    //         siblingButton.classList.add('selected');
-                    //     }
-                    //     parent = parent.parentElement;
-                    // }
-                    // // open content
-                    // console.log("NAV 1", item, category)
-
-                    // current = item.path;
-                    // highlightNavPath()
                     goto(item.path)
                     loadContent(this.getAttribute('data-path'))
                 });
