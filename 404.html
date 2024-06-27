@@ -31,7 +31,7 @@
             if (!isBot) {
                 // If it's not a bot, redirect to the home page with the path as a query parameter
                 const path = window.location.pathname;
-                window.location.href = '/?path=' + encodeURIComponent(path);
+                window.location.href = '/home?path=' + encodeURIComponent(path);
             } else {
                 // If it is a bot, dynamically load the content based on the path
                 const path = window.location.pathname;
