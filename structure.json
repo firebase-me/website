@@ -14,19 +14,6 @@
             "type": "dir",
             "children": [
               {
-                "name": "admin_sdk",
-                "path": "pages/services/authentication/admin_sdk",
-                "type": "dir",
-                "children": [
-                  {
-                    "name": "import_users.md",
-                    "path": "pages/services/authentication/admin_sdk/import_users.md",
-                    "type": "file",
-                    "children": []
-                  }
-                ]
-              },
-              {
                 "name": "blocking_functions",
                 "path": "pages/services/authentication/blocking_functions",
                 "type": "dir",
@@ -169,6 +156,19 @@
         "path": "pages/tutorials/firebase",
         "type": "dir",
         "children": [
+          {
+            "name": "admin_sdk",
+            "path": "pages/tutorials/firebase/admin_sdk",
+            "type": "dir",
+            "children": [
+              {
+                "name": "import_users.md",
+                "path": "pages/tutorials/firebase/admin_sdk/import_users.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          },
           {
             "name": "app_features",
             "path": "pages/tutorials/firebase/app_features",
