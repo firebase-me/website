@@ -30,35 +30,6 @@ function goto(dest, stub = false) {
     highlightNavPath();
 }
 
-function findCategory(path) {
-    const values = path.split('/')
-
-    let cat = jsonData.find(i => i.name === (values[0]?values[0]:values[1]))
-    console.log('FIND CAT', path, cat, values)
-    return cat;
-}
-
-function findSource(path) {
-    console.log("Find Source", path, typeof path)
-    if (path && path.endsWith('.md'))
-        return path;
-    let source;
-    switch (path) {
-        case 'privacy': source = 'assets/privacy.md'; break;
-        case 'contact': source = 'assets/contact.md'; break;
-        case '404': source = 'assets/404.md'; break;
-        case 'markdown': source = 'assets/markdown.md'; break;
-        case '':
-        case 'home':
-        case 'index.html':
-        case null: source = 'assets/welcome.md'; break;
-        default:
-            source = `pages/${path}.md`
-            break;
-    }
-    if (!source) throw new Error("No source found for path: " + path);
-    return source.replace('//', '/');
-}
 
 // Function to get query parameters from the URL
 function getQueryParams() {
