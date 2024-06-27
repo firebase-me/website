@@ -17,8 +17,8 @@
         </div>
     </header>
     <main>
-        <h2 id="document-title">Loading...</h2>
-        <div class="content-body" id="content">Restoring single page behaviour...</div>
+        <h2 id="document-title"></h2>
+        <div class="content-body" id="content"></div>
     </main>
     <footer>
         <p><br /></p>
@@ -59,6 +59,7 @@
                 switch (path) {
                     case '/privacy': source = '/assets/privacy.md'; break;
                     case '/contact': source = '/assets/contact.md'; break;
+                    case '/404.html':
                     case '/404': source = '/assets/404.md'; break;
                     case '/markdown': source = '/assets/markdown.md'; break;
                     case '/':
