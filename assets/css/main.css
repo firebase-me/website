@@ -79,8 +79,8 @@ main {
     padding: 20px;
     overflow-y: auto;
     min-width: 12rem;
-    border-top: 5px blue solid;
-    border-bottom: 5px blue solid;
+    border-top: 5px gold solid;
+    border-bottom: 5px gold solid;
 }
 
 main h2 {
