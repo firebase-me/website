@@ -16,11 +16,13 @@ fetch('/structure.json')
         current = findSource(target);
         category = cat ? cat.name : jsonData[0].name;
         generateCategories(data, category);
+        
+        goto(target)
 
-        // handle in the case of 404 redirects
-        console.log("REDIRECT4", category, current)
+        // // handle in the case of 404 redirects
+        // console.log("REDIRECT4", category, current)
 
-        highlightNavPath();
+        // highlightNavPath();
 
 
     })
