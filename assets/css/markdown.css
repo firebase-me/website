@@ -32,8 +32,35 @@
 
 .code-container {
     margin-bottom: 20px;
+}.code-group {
+    display: flex;
+    flex-wrap: wrap; /* Allow children to wrap to the next line */
+    align-items: center; /* Vertically center the h4 and select */
 }
 
+.code-group h4,
+.code-group .language-selector {
+    margin: 0;
+    flex: 0 0 auto; /* Prevent these elements from stretching */
+}
+
+.code-group .language-selector {
+    margin-left: 10px; /* Optional: Add space between h4 and select */
+}
+
+.code-group pre {
+    width: 100%; /* Make each pre block take full width */
+    margin: 10px 0; /* Optional: Add margin between pre blocks */
+    white-space: pre-wrap; /* Preserve formatting */
+    flex-wrap: nowrap;
+    /* flex: 0 0 100%; Ensure the pre elements take full width and wrap to a new line */
+    padding: 20px;
+    margin: 20px;
+}
+
+.language-selector {
+    margin-left: 10px; /* Optional: Add space between h4 and select */
+}
 .warning {
     background-color: #f8d7da;
     padding: 10px;
@@ -63,6 +90,12 @@ img {
     transition: transform 0.2s;
 }
 
+pre {
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: auto; /* Crop overflow content */
+    text-overflow: ellipsis; /* Optionally add ellipsis to cropped content */
+    padding:10px;
+}
 .centered-content img {
     display: block;
     margin: 10px auto;
@@ -94,3 +127,32 @@ img {
     transform: scale(1.5);
     z-index: 1000;
 }
+
+/* Markdown language selector */
+.language-selector {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+    appearance: none; /* Remove default styling */
+}
+
+.language-selector:hover,
+.language-selector:focus {
+    border-color: #fbbd08;
+    background-color: #444;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(251, 189, 8, 0.5);
+    outline: none;
+}
+
+.language-selector option {
+    background-color: #333;
+    color: #fff;
+}
+
