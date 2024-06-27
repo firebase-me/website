@@ -69,7 +69,6 @@
 /* Centered Images */
 .centered-content {
     text-align: center;
-    width: 100%;
     padding: 10px;
 }
 
@@ -96,6 +95,14 @@ pre {
     text-overflow: ellipsis; /* Optionally add ellipsis to cropped content */
     padding:10px;
 }
+pre code {
+    display: block;
+    padding: 1em;
+    background: #2d2d2d; /* Dark background */
+    color: #f8f8f2; /* Light text */
+    overflow-x: auto;
+}
+
 .centered-content img {
     display: block;
     margin: 10px auto;

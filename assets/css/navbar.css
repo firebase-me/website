@@ -13,7 +13,7 @@
 .crumbs {
     background-color: #333;
     padding: 10px;
-    height: 20px;
+    height: 0px;
     /* Default height when empty */
     overflow-y: scroll;
     transition: height 0.5s ease;

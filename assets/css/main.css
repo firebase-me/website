@@ -93,8 +93,6 @@ main h2 {
 main .content-body {
     background-color: #f1f1f1;
     padding: 20px;
-
-    width: 100%; /* Adjust width as needed */
     overflow: hidden; /* Crop overflow content */
 }
 

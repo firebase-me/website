@@ -34,6 +34,27 @@ Our community is hosted on Discord where you can interact with other Firebase en
 ### Join our [Discord](https://discord.firebase.me "Firebase Me on Discord") community
 {{endgroup}}
 
+### Stylings
+{{group:center}}
+Centers all content vertically
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+{{endgroup}}
+
+{{group:carousel}}
+Aligns all images horizontally
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+other content
+### breaks carousel
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+{{endgroup}}
 We are an open community of over 6000 users run by volunteers. Join Firebase Developers! a Discord community dedicated to Firebase and its services. Started in September 2019, we've been assisting various users with Firebase-related questions and are going strong!
 
 {{group:carousel}}
