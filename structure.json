@@ -14,6 +14,19 @@
             "type": "dir",
             "children": [
               {
+                "name": "admin_sdk",
+                "path": "pages/services/authentication/admin_sdk",
+                "type": "dir",
+                "children": [
+                  {
+                    "name": "import_users.md",
+                    "path": "pages/services/authentication/admin_sdk/import_users.md",
+                    "type": "file",
+                    "children": []
+                  }
+                ]
+              },
+              {
                 "name": "blocking_functions",
                 "path": "pages/services/authentication/blocking_functions",
                 "type": "dir",
