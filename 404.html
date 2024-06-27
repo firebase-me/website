@@ -23,6 +23,7 @@
     <footer>
         <p><br /></p>
     </footer>
+    <script src="/assets/utils.js"></script>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const userAgent = navigator.userAgent.toLowerCase();
@@ -53,26 +54,7 @@
                     });
             }
 
-            function findSource(path) {
-                if (path && path.endsWith('.md')) return path;
-                if(path.startsWith('/'))
-                path = path.slice(1);
-                let source;
-                switch (path) {
-                    case 'privacy': source = '/assets/privacy.md'; break;
-                    case 'contact': source = '/assets/contact.md'; break;
-                    case '404.html':
-                    case '404': source = '/assets/404.md'; break;
-                    case 'markdown': source = '/assets/markdown.md'; break;
-                    case '':
-                    case 'home':
-                    case 'index.html':
-                    case null: source = '/assets/welcome.md'; break;
-                    default: source = `/pages${path}.md`; break;
-                }
-                if (!source) throw new Error("No source found for path: " + path);
-                return source.replace('//', '/');
-            }
+
 
             function updateMetaTags(path) {
                 const titleElement = document.querySelector('title');
