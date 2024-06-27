@@ -24,6 +24,7 @@ function getQueryParams(item) {
 }
 
 function findCategory(path) {
+    if (path.startsWith('/')) path = path.slice(1);
     const values = path.split('/')
 
     let cat = jsonData.find(i => i.name === (values[0] ? values[0] : values[1]))
