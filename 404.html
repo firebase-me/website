@@ -5,49 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firebase Me</title>
     <link rel="stylesheet" href="/assets/styles.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/dracula.min.css">
-
-    <script type="text/javascript">
-        window.location.href = '/?path=' + encodeURIComponent(window.location.pathname);
-    </script>
+    <meta name="robots" content="index, follow">
 </head>
-
 <body>
     <header>
         <div class="title">
             <img src="/assets/images/icon.png" alt="Icon">
-            <h1><a href="#" id="home-link" style="color: white;">Firebase Me</a></h1>
-        </div>
-        <div class="categories" id="category-list">
-            <!-- Categories will be dynamically loaded here -->
+            <h1><a href="/" style="color: white;">Firebase Me</a></h1>
         </div>
     </header>
-    <div class="container">
-        <nav>
-            <ul class="tocs" id="toc-list">
-                <!-- Navigation items will be dynamically loaded here -->
-            </ul>
-            <ul class="subjects" id="subject-list">
-                <!-- Navigation items will be dynamically loaded here -->
-            </ul>
-        </nav>
-        <main id="content">
-            <h2 id="document-title" style="margin-bottom: 0px;">
-                <br/>
-            </h2>
-            <div class="content-body" id="markdown-content">
-                Restoring single page behaviour
-            </div>
-        </main>
-    </div>
+    <main>
+        <h2 id="document-title">Loading...</h2>
+        <div class="content-body" id="content">Restoring single page behaviour...</div>
+    </main>
     <footer>
-        <p>
-            <br />
-        </p>
+        <p><br /></p>
     </footer>
-</body>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isBot = /bot|crawl|spider|slurp|mediapartners|adsbot|google|bing|yandex|baidu|duckduckbot|facebot|ia_archiver/.test(userAgent);
 
+            if (!isBot) {
+                // If it's not a bot, redirect to the home page with the path as a query parameter
+                const path = window.location.pathname;
+                window.location.href = '/?path=' + encodeURIComponent(path);
+            } else {
+                // If it is a bot, dynamically load the content based on the path
+                const path = window.location.pathname;
+                fetchContent(path);
+            }
+
+            function fetchContent(path) {
+                const contentElement = document.getElementById('content');
+                const source = findSource(path);
+                fetch(source)
+                    .then(response => response.text())
+                    .then(data => {
+                        contentElement.innerHTML = data;
+                        updateMetaTags(path);
+                    })
+                    .catch(error => {
+                        contentElement.innerHTML = 'Content not found.';
+                        console.error('Error loading content:', error);
+                    });
+            }
+
+            function findSource(path) {
+                if (path && path.endsWith('.md')) return path;
+                let source;
+                switch (path) {
+                    case '/privacy': source = '/assets/privacy.md'; break;
+                    case '/contact': source = '/assets/contact.md'; break;
+                    case '/404': source = '/assets/404.md'; break;
+                    case '/markdown': source = '/assets/markdown.md'; break;
+                    case '/':
+                    case '/home':
+                    case '/index.html':
+                    case null: source = '/assets/welcome.md'; break;
+                    default: source = `/pages${path}.md`; break;
+                }
+                if (!source) throw new Error("No source found for path: " + path);
+                return source.replace('//', '/');
+            }
+
+            function updateMetaTags(path) {
+                const titleElement = document.querySelector('title');
+                const metaDescription = document.querySelector('meta[name="description"]');
+                
+                switch (path) {
+                    case '/privacy':
+                        titleElement.textContent = 'Privacy Policy - Firebase Me';
+                        metaDescription.setAttribute('content', 'Read our privacy policy.');
+                        break;
+                    case '/contact':
+                        titleElement.textContent = 'Contact Us - Firebase Me';
+                        metaDescription.setAttribute('content', 'Get in touch with us.');
+                        break;
+                    default:
+                        titleElement.textContent = 'Firebase Me';
+                        metaDescription.setAttribute('content', 'Welcome to Firebase Me.');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
 </html>
