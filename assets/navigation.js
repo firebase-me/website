@@ -7,11 +7,16 @@ function goto(dest, stub = false) {
     }
     const loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
     // this triggers redirect to load the page content
+    console.log("GOTO:", loc, )
+    if(!window.location.origin.includes('localhost')){
     if (stub) {
         history.pushState(null, window.location.hostname, loc);
     }
     else {
         history.pushState(null, window.location.hostname, '/' + loc);
+    }}
+    else {
+        history.replaceState(null, window.location.hostname, loc);
     }
     const source = findSource(dest)
     current = source;
