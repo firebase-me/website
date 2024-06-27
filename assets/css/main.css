@@ -15,6 +15,7 @@ body {
     display: flex;
     flex: 1;
     width: 100%;
+    overflow: hidden; /* Crop overflow content */
     overflow-y: auto;
     background-image: url('/assets/images/background.jpg');
     background-color: #ffa100;
@@ -92,6 +93,7 @@ main h2 {
 main .content-body {
     background-color: #f1f1f1;
     padding: 20px;
+    overflow: hidden; /* Crop overflow content */
 }
 
 main .breadcrumb {

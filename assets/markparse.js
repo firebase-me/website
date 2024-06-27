@@ -1,5 +1,48 @@
 let currentLanguage = 'js'; // Default language
 
+const languages = [
+    'js', 'swift', 'kotlin', 'java', 'ts', 'node', 
+    'dart', 'cpp', 'unity', 'restapi', 'objc', 'go', 
+    'php', 'python', 'ruby'
+];
+
+function unpackLanguage(input) {
+    switch (input) {
+        case 'js':
+            return "JavaScript";
+        case 'swift':
+            return "Swift";
+        case 'kotlin':
+            return "Kotlin";
+        case 'java':
+            return "Java";
+        case 'ts':
+            return "TypeScript";
+        case 'node':
+            return "Node.js";
+        case 'dart':
+            return "Dart";
+        case 'cpp':
+            return "C++";
+        case 'unity':
+            return "Unity";
+        case 'restapi':
+            return "REST API";
+        case 'objc':
+            return "Objective-C";
+        case 'go':
+            return "Go";
+        case 'php':
+            return "PHP";
+        case 'python':
+            return "Python";
+        case 'ruby':
+            return "Ruby";
+        default:
+            return "Missing";
+    }
+}
+
 async function loadContent(url) {
     console.log("Loading content 1:", url)
     let text = ''
@@ -173,7 +216,9 @@ function renderCarousel(content) {
 function renderCodeGroup(groupContent) {
     const languages = ['js', 'node', 'python'];
     const languageOptions = languages.map(lang => `<option value="${lang}">${lang.toUpperCase()}</option>`).join('');
-    let result = `<div class="code-group"><select class="language-selector">${languageOptions}</select>\n`;
+    let result = `<div class="code-group">
+    <h4 class="inline">Language</h4>
+    <select class="language-selector">${languageOptions}</select>\n`;
 
     languages.forEach(lang => {
         const regex = new RegExp(`^\\s*\\\`\\\`\\\`${lang}([\\s\\S]*?)\\\`\\\`\\\``, 'm');
@@ -186,16 +231,81 @@ function renderCodeGroup(groupContent) {
     result += `<div class="language-warning" style="display: none;"></div></div>`;
     return result;
 }
+function renderCodeGroup(groupContent) {
+    const allLanguages = ['js', 'node', 'python'];
+    let availableLanguages = [];
+    const codeBlocks = {};
+
+    // Create the main code group container
+    const codeGroupDiv = document.createElement('div');
+    codeGroupDiv.className = 'code-group';
+
+    // Create the header
+    const header = document.createElement('h4');
+    header.className = 'inline';
+    header.textContent = 'Code';
+    codeGroupDiv.appendChild(header);
+
+    // Create the select dropdown
+    const select = document.createElement('select');
+    select.className = 'language-selector';
+    codeGroupDiv.appendChild(select);
+
+    // Iterate through all languages to find available ones
+    allLanguages.forEach(lang => {
+        const regex = new RegExp(`^\\s*\\\`\\\`\\\`${lang}([\\s\\S]*?)\\\`\\\`\\\``, 'm');
+        const match = groupContent.match(regex);
+        if (match) {
+            availableLanguages.push(lang);
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.className = `language-${lang}`;
+            code.textContent = match[1].trim();
+            pre.appendChild(code);
+            codeBlocks[lang] = pre;
+        }
+    });
+
+    // Provide a fallback if no languages are available
+    if (availableLanguages.length === 0) {
+        availableLanguages = ['none'];
+        const pre = document.createElement('pre');
+        const code = document.createElement('code');
+        code.className = 'language-none';
+        code.textContent = 'No content available';
+        pre.appendChild(code);
+        codeBlocks['none'] = pre;
+    }
+
+    // Create the select dropdown with available languages only
+    const availableLanguageOptions = availableLanguages.map(lang => `<option value="${lang}">${lang.toUpperCase()}</option>`).join('');
+    select.innerHTML = availableLanguageOptions;
+
+    // Append the code blocks last
+    Object.keys(codeBlocks).forEach(lang => {
+        codeGroupDiv.appendChild(codeBlocks[lang]);
+    });
+
+    // Add warning div
+    const warningDiv = document.createElement('div');
+    warningDiv.className = 'language-warning';
+    warningDiv.style.display = 'none';
+    codeGroupDiv.appendChild(warningDiv);
+
+    return codeGroupDiv.outerHTML;
+}
 
 function updateCodeGroupVisibility() {
     document.querySelectorAll('.code-group').forEach(group => {
-        const codeBlocks = group.querySelectorAll('pre code');
+        const codeBlocks = group.querySelectorAll('pre');
         let languageFound = false;
 
         codeBlocks.forEach(block => {
-            if (block.className.includes(`language-${currentLanguage}`)) {
+            const code = block.querySelector('code');
+            if (code.className.includes(`language-${currentLanguage}`)) {
                 block.style.display = 'block';
                 languageFound = true;
+                hljs.highlightElement(code); // Highlight the visible code block
             } else {
                 block.style.display = 'none';
             }
@@ -208,9 +318,24 @@ function updateCodeGroupVisibility() {
             warning.style.display = 'block';
             warning.textContent = `${currentLanguage.toUpperCase()} does not support this feature.`;
         }
+
+        const header = group.querySelector('h4.inline');
+        if (header) {
+            header.textContent = "Code: " + unpackLanguage(currentLanguage);
+        }
     });
 
     document.querySelectorAll('.language-selector').forEach(selector => {
         selector.value = currentLanguage;
+    });
+}
+
+// Add event listeners to all language selectors
+function addLanguageChangeListeners() {
+    document.querySelectorAll('.language-selector').forEach(selector => {
+        selector.addEventListener('change', (event) => {
+            currentLanguage = event.target.value;
+            updateCodeGroupVisibility();
+        });
     });
 }

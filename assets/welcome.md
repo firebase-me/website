@@ -11,11 +11,50 @@ To get started, choose a category from the top which will change the navigation 
 ## Community
 Our community is hosted on Discord where you can interact with other Firebase enthusiasts, discuss your projects, or ask questions in our dedicated threads.
 
+{{group:code}}
+```js
+          // this code will run off and needs to be cropped within view of the content window/panel -------------------- ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt test
+```
+```python
+          BIG PYTHON TESTsdsdfsdfsd
+```
+{{endgroup}}
+
+{{group:code}}
+```js
+          // second code block JS
+```
+```python
+         // second code block PY
+```
+{{endgroup}}
+
 {{group:center}}
 ![Discord Logo](/assets/images/discord-purple.png)
 ### Join our [Discord](https://discord.firebase.me "Firebase Me on Discord") community
 {{endgroup}}
 
+### Stylings
+{{group:center}}
+Centers all content vertically
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+{{endgroup}}
+
+{{group:carousel}}
+Aligns all images horizontally
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+other content
+### breaks carousel
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+![Alt Text](/assets/images/icon.png)
+{{endgroup}}
 We are an open community of over 6000 users run by volunteers. Join Firebase Developers! a Discord community dedicated to Firebase and its services. Started in September 2019, we've been assisting various users with Firebase-related questions and are going strong!
 
 {{group:carousel}}
