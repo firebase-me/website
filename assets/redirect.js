@@ -11,15 +11,15 @@ fetch('/structure.json')
 
         // Initialize selection based on URL query parameter
         const params = getQueryParams('path');
-        const target = params.path ? params.path: "home";
+        const target = params.path ? params.path : "home";
         const cat = findCategory(target)
-        console.log("CAT START",cat)
-        generateCategories(data,cat);
         current = findSource(target);
-        console.log("INIT PARAMS", params)
+        category = cat ? cat.name : jsonData[0].name;
+        generateCategories(data, category);
+
         // handle in the case of 404 redirects
-        console.log("REDIRECT", category, current)
-        
+        console.log("REDIRECT4", category, current)
+
         highlightNavPath();
 
 

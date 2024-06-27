@@ -8,23 +8,25 @@ function goto(dest, stub = false) {
     const loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
     // this triggers redirect to load the page content
     if (stub) {
-        // history.pushState(null, window.location.hostname, loc);
+        history.pushState(null, window.location.hostname, loc);
     }
     else {
-        // history.pushState(null, window.location.hostname, '/' + loc);
+        history.pushState(null, window.location.hostname, '/' + loc);
     }
     const source = findSource(dest)
     current = source;
-    loadContent(source);    
-    clearNavHighlights();
+    loadContent(source);
+    highlightNavPath();
 }
 
 function findCategory(path) {
-    
-    const cat = jsonData.find(i => path.startsWith(i.path))
+    const values = path.split('/')
+
+    let cat = jsonData.find(i => i.name === values[0])
     console.log('FIND CAT', path, cat)
     return cat;
 }
+
 function findSource(path) {
     console.log("Find Source", path, typeof path)
     if (path && path.endsWith('.md'))
@@ -60,18 +62,21 @@ function getQueryParams() {
 }
 
 // Function to generate categories for header buttons
-function generateCategories(data, priority) {
+function generateCategories(data) {
     const headerButtons = document.getElementById('category-list');
     headerButtons.innerHTML = ''; // Clear existing buttons
     for (const item of data) {
+        console.log("GEN CAT", category, item)
         const button = document.createElement('button');
         button.textContent = item.name;
         button.addEventListener('click', () => {
             switchCategory(item.children, item.name);
         });
         headerButtons.appendChild(button);
-        if (category == null || (priority && priority === item.name)) {
+        if (category == null) {
             category = item.name;
+        }
+        if (category == item.name) {
             switchCategory(item.children, item.name);
         }
     }
@@ -83,9 +88,10 @@ function switchCategory(data, source) {
     navbar.innerHTML = ''; // Clear existing content
     generateNavbar(data, navbar);
     console.log("CHANGING CATEGORY", category, source, current)
-    if (typeof current === 'string' && category == source) {
-        highlightNavPath()
-    }
+    highlightNavPath()
+    // if (typeof current === 'string' && category == source) {
+    // highlightNavPath()
+    // }
 }
 
 // Function to generate the navbar HTML based on JSON data
@@ -130,23 +136,26 @@ function generateNavbar(data, parentElement, depth = 0) {
                 link.setAttribute('data-path', item.path); // Add data-path attribute
                 link.addEventListener("click", function () {
                     console.log("ITEM CLICK", item.path);
-                    const allLinks = document.querySelectorAll('.navbar a, .navbar button');
-                    for (const link of allLinks) {
-                        link.classList.remove('selected', 'selected-file');
-                    }
-                    this.classList.add('selected', 'selected-file');
-                    let parent = this.parentElement;
-                    while (parent && parent.classList.contains('dropdown-container')) {
-                        const siblingButton = parent.previousElementSibling;
-                        if (siblingButton) {
-                            siblingButton.classList.add('selected');
-                        }
-                        parent = parent.parentElement;
-                    }
-                    // open content
-                    console.log("NAV 1", item, category)
+                    current = item.path
+                    // const allLinks = document.querySelectorAll('.navbar a, .navbar button');
+                    // for (const link of allLinks) {
+                    //     link.classList.remove('selected', 'selected-file');
+                    // }
+                    // this.classList.add('selected', 'selected-file');
+                    // let parent = this.parentElement;
+                    // while (parent && parent.classList.contains('dropdown-container')) {
+                    //     const siblingButton = parent.previousElementSibling;
+                    //     if (siblingButton) {
+                    //         siblingButton.classList.add('selected');
+                    //     }
+                    //     parent = parent.parentElement;
+                    // }
+                    // // open content
+                    // console.log("NAV 1", item, category)
 
-                    current = item.path;
+                    // current = item.path;
+                    // highlightNavPath()
+                    goto(item.path)
                     loadContent(this.getAttribute('data-path'))
                 });
                 parentElement.appendChild(link);
@@ -164,40 +173,30 @@ function clearNavHighlights() {
 }
 // Function to initialize the selection based on the query parameter
 function highlightNavPath() {
+    console.warn("HIGHLIGHT", category, current);
     clearNavHighlights()
     if (!current) return;
-    const newcat = findCategory(current)
-    const source = findSource(current);
+    if (!category) return;
+    // switchCategory(newcat.name)
+    // history.replaceState(null, 'Firebase Me: ' + paths[paths.length - 1], '/' + paths.join('/'))
 
-    if (!newcat) {
-        loadContent(source)
-        return;
-    }
-    else {
-        // history.replaceState(null, 'Firebase Me: ' + paths[paths.length - 1], '/' + paths.join('/'))
-    }
 
     // find target button and iterate through parents
     const target = findNavButtonByPath(current)
 
-    console.log("HIGHLIGHT NAV TARGET", target)
-    // FIXME: known issue
-    // 1. if you pick a nav item
-    // 2. change the category
-    // 3. pick another item
-    // 4. and change the category again
-    // 5. target == undefined
-    // why? no idea.
-    if(target)
-    target.classList.add('selected', 'selected-file');
-    let parent = target.parentElement;
-    while (parent && parent.classList.contains('dropdown-container')) {
-        const siblingButton = parent.previousElementSibling;
-        if (siblingButton) {
-            siblingButton.classList.add('selected', 'open');
+    console.log("HIGHLIGHT NAV TARGET", target, 'category', category, 'current', current)
+
+    if (target) {
+        target.classList.add('selected', 'selected-file');
+        let parent = target.parentElement;
+        while (parent && parent.classList.contains('dropdown-container')) {
+            const siblingButton = parent.previousElementSibling;
+            if (siblingButton) {
+                siblingButton.classList.add('selected', 'open');
+            }
+            parent.style.display = "block";
+            parent = parent.parentElement;
         }
-        parent.style.display = "block";
-        parent = parent.parentElement;
     }
     // trigger content
     console.log("NAV current")
