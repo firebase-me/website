@@ -18,6 +18,12 @@ async function run() {
 
         const isNewArticle = issue.labels.some(label => label.name === 'new-article');
         const isChangeRequest = issue.labels.some(label => label.name === 'change-request');
+        const isIssueEdited = context.payload.action === 'edited';
+
+        if (isIssueEdited) {
+            console.log("Issue edited detected");
+            await handleIssueEdit(issue);
+        }
 
         if (isNewArticle) {
             console.log("New article detected");
@@ -81,6 +87,41 @@ async function run() {
     } catch (err) {
         console.error("Error running script", err);
         process.exit(1);
+    }
+}
+
+async function handleIssueEdit(issue) {
+    const { number: issueNumber, body: issueBody, labels } = issue;
+
+    // Check if the issue is labeled as approved
+    const approvedLabel = labels.find(label => label.name === 'article-approved');
+    if (approvedLabel) {
+        console.log(`Issue #${issueNumber} is labeled as 'article-approved'. Checking for edits...`);
+
+        // Check if the issue body contains the article template keywords
+        if (!isValidArticleTemplate(issueBody)) {
+            console.log(`Issue #${issueNumber} does not match the article template. Removing 'article-approved' label.`);
+
+            // Remove the 'article-approved' label
+            await octokit.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                name: 'article-approved'
+            });
+
+            // Add a comment to the issue indicating the label was removed due to edits
+            await octokit.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: `The 'article-approved' label was removed because the issue was edited and no longer matches the required template.`
+            });
+        } else {
+            console.log(`Issue #${issueNumber} still matches the article template.`);
+        }
+    } else {
+        console.log(`Issue #${issueNumber} is not labeled as 'article-approved'.`);
     }
 }
 
@@ -159,7 +200,7 @@ async function addNewArticle(issueNumber, articleTitle, articleContent, articleP
 async function updateArticle(issueNumber, articlePath, linesToChange, proposedChanges, branchName) {
     const cleanArticlePath = articlePath.trim().replace(/\s+/g, ' ');
     const filePath = path.join('pages', cleanArticlePath);
-    
+
     let sha;
     try {
         const { data: file } = await octokit.repos.getContent({
@@ -178,7 +219,7 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
     if (!fs.existsSync(filePath)) {
         console.log(`File does not exist at path: ${filePath}. Creating a placeholder file.`);
         const placeholderContent = `# Placeholder\n\nThis is a placeholder file for ${cleanArticlePath}.`;
-        
+
         // Create the directory if it doesn't exist
         const dirPath = path.dirname(filePath);
         if (!fs.existsSync(dirPath)) {
@@ -200,7 +241,7 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
         await updateIssueComment(issueNumber, `Placeholder file created at path: ${filePath}\n\nUUID: ${branchName}`);
         return;
     }
-    
+
     console.log(`Updating article at ${filePath}`);
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const updatedContent = applyChanges(fileContent, linesToChange, proposedChanges);
@@ -333,6 +374,16 @@ function applyChanges(content, linesToChange, changes) {
         ...contentLines.slice(end)
     ];
     return updatedLines.join('\n');
+}
+
+function isValidArticleTemplate(issueBody) {
+    const articleTemplateKeywords = [
+        '**Article Title**',
+        '**Article Content**',
+        '**Article Path**'
+    ];
+
+    return articleTemplateKeywords.every(keyword => issueBody.includes(keyword));
 }
 
 run().catch(err => {
