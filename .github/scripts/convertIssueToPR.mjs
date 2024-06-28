@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { context } from "@actions/github";
+import { getOctokit, context } from "@actions/github";
 import fs from 'fs';
 import path from 'path';
 
@@ -8,45 +8,58 @@ const octokit = new Octokit({
 });
 
 async function run() {
-    const issue = context.payload.issue;
+    try {
+        const scriptVersion = "v1.0.1"; // Update this version string when you make changes
+        console.log(`Running script version: ${scriptVersion}`);
 
-    if (issue.labels.some(label => label.name === 'new-article')) {
-        const [articleTitle, articleContent, articlePath] = parseNewArticleIssue(issue.body);
-        if (!articleTitle || !articlePath) {
-            await updateIssueComment(issue.number, 'Invalid article title or path.');
-            return;
-        }
-        const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
+        const issue = context.payload.issue;
+        console.log(`Processing issue #${issue.number}`);
 
-        // Create or update the branch
-        await createOrUpdateBranch(branchName);
+        if (issue.labels.some(label => label.name === 'new-article')) {
+            console.log("New article detected");
+            const [articleTitle, articleContent, articlePath] = parseNewArticleIssue(issue.body);
+            if (!articleTitle || !articlePath) {
+                await updateIssueComment(issue.number, 'Invalid article title or path.');
+                return;
+            }
+            const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
 
-        // Add the new article
-        await addNewArticle(issue.number, branchName, articleTitle, articleContent, articlePath);
+            // Create or update the branch
+            await createOrUpdateBranch(branchName);
 
-        // Create or update the pull request
-        await createOrUpdatePullRequest(issue.title, branchName, issue.number);
-    }
+            // Add the new article
+            await addNewArticle(issue.number, branchName, articleTitle, articleContent, articlePath);
 
-    if (issue.labels.some(label => label.name === 'change-request')) {
-        const [articleToChange, linesToChange, proposedChanges] = parseIssueBody(issue.body);
-        if (!articleToChange) {
-            await updateIssueComment(issue.number, 'Invalid article path.');
-            return;
-        }
-        const branchName = `issue-${issue.number}-change-request`;
-
-        // Create or update the branch
-        await createOrUpdateBranch(branchName);
-
-        // Update the article
-        await updateArticle(issue.number, branchName, articleToChange, linesToChange, proposedChanges);
-
-        // Check if the issue is marked as ready for review
-        if (issue.labels.some(label => label.name === 'ready-for-review')) {
             // Create or update the pull request
             await createOrUpdatePullRequest(issue.title, branchName, issue.number);
         }
+
+        if (issue.labels.some(label => label.name === 'change-request')) {
+            console.log("Change request detected");
+            const [articleToChange, linesToChange, proposedChanges] = parseIssueBody(issue.body);
+            if (!articleToChange) {
+                await updateIssueComment(issue.number, 'Invalid article path.');
+                return;
+            }
+            const branchName = `issue-${issue.number}-change-request`;
+
+            // Create or update the branch
+            await createOrUpdateBranch(branchName);
+
+            // Update the article
+            await updateArticle(issue.number, branchName, articleToChange, linesToChange, proposedChanges);
+
+            // Check if the issue is marked as ready for review
+            if (issue.labels.some(label => label.name === 'ready-for-review')) {
+                // Create or update the pull request
+                await createOrUpdatePullRequest(issue.title, branchName, issue.number);
+            }
+        }
+
+        console.log("Script completed successfully");
+    } catch (err) {
+        console.error("Error running script", err);
+        process.exit(1);
     }
 }
 
@@ -183,9 +196,9 @@ function parseNewArticleIssue(body) {
 
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim());
-    const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
+    const articleToChange = lines.find(line.startsWith('**Article to Change**')).split(': ')[1];
+    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
@@ -204,6 +217,6 @@ function applyChanges(content, linesToChange, changes) {
 }
 
 run().catch(err => {
-    console.error(err);
+    console.error("Error running script", err);
     process.exit(1);
 });
