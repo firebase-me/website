@@ -62,9 +62,18 @@ async function run() {
 }
 
 async function addNewArticle(issueNumber, articleTitle, articleContent, articlePath) {
-    const filePath = path.join('pages', articlePath, `${articleTitle.replace(/\s+/g, '_').toLowerCase()}.md`);
+    // Trim and normalize the path and title
+    const cleanArticlePath = articlePath.trim().replace(/\s+/g, ' ');
+    const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
+    const filePath = path.join('pages', cleanArticlePath, `${cleanArticleTitle}.md`);
     const content = `# ${articleTitle}\n\n${articleContent}`;
     console.log(`Adding new article at ${filePath}`);
+
+    // Ensure the directory exists
+    const dirPath = path.dirname(filePath);
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
 
     fs.writeFileSync(filePath, content);
 
@@ -81,11 +90,34 @@ async function addNewArticle(issueNumber, articleTitle, articleContent, articleP
 }
 
 async function updateArticle(issueNumber, articlePath, linesToChange, proposedChanges) {
-    const filePath = path.join('pages', articlePath);
+    const cleanArticlePath = articlePath.trim().replace(/\s+/g, ' ');
+    const filePath = path.join('pages', cleanArticlePath);
+    
     if (!fs.existsSync(filePath)) {
-        await updateIssueComment(issueNumber, `File does not exist at path: ${filePath}`);
+        console.log(`File does not exist at path: ${filePath}. Creating a placeholder file.`);
+        const placeholderContent = `# Placeholder\n\nThis is a placeholder file for ${cleanArticlePath}.`;
+        
+        // Create the directory if it doesn't exist
+        const dirPath = path.dirname(filePath);
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
+        }
+
+        fs.writeFileSync(filePath, placeholderContent);
+
+        await octokit.repos.createOrUpdateFileContents({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            path: filePath,
+            message: `Create placeholder file from issue #${issueNumber}`,
+            content: Buffer.from(placeholderContent).toString('base64'),
+            branch: 'main' // Update directly in the main branch
+        });
+
+        await updateIssueComment(issueNumber, `Placeholder file created at path: ${filePath}`);
         return;
     }
+    
     console.log(`Updating article at ${filePath}`);
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const updatedContent = applyChanges(fileContent, linesToChange, proposedChanges);
@@ -167,7 +199,7 @@ async function updateIssueComment(issueNumber, comment) {
 }
 
 function parseNewArticleIssue(body) {
-    const lines = body.split('\n').map(line => line.trim());
+    const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleTitle = lines.find(line => line.startsWith('**Article Title**')).split(': ')[1];
     const articlePath = lines.find(line => line.startsWith('**Article Path**')).split(': ')[1];
     const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Article Content**'));
@@ -176,7 +208,7 @@ function parseNewArticleIssue(body) {
 }
 
 function parseIssueBody(body) {
-    const lines = body.split('\n').map(line => line.trim());
+    const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
     const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
     const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
