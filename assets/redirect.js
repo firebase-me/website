@@ -8,7 +8,7 @@ fetch('/structure.json')
 
         // Initialize selection based on URL query parameter
         const params = getQueryParams('path');
-        const target = params.path ? params.path : "home";
+        const target = params.path ? decodeURIComponent(params.path) : "home";
         const cat = findCategory(target)
         current = findSource(target);
         category = cat ? cat.name : jsonData[0].name;
