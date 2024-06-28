@@ -30,7 +30,10 @@ async function run() {
                 return;
             }
 
-            const branchUUID = await getBranchUUID(issue.number) || uuidv4().replace(/-/g, '').substring(0, 10);
+            let branchUUID = await getBranchUUID(issue.number);
+            if (!branchUUID) {
+                branchUUID = uuidv4().replace(/-/g, '').substring(0, 10);
+            }
             const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
             const branchName = `article-new-${cleanArticleTitle}-${branchUUID}`;
 
@@ -181,7 +184,11 @@ async function createOrUpdatePullRequest(title, branchName, issueNumber, branchU
     });
 
     // Check if a PR already exists for the issue
-    let pullRequest = pulls.data.find(pr => pr.head.ref === branchName);
+    let pullRequest = pulls.data.find(pr => {
+        const prUUID = pr.title.match(/\[UUID: ([^\]]+)\]/);
+        return prUUID && prUUID[1] === branchUUID;
+    });
+
     if (pullRequest) {
         await octokit.pulls.update({
             owner: context.repo.owner,
@@ -265,7 +272,7 @@ function parseNewArticleIssue(body) {
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
     const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
