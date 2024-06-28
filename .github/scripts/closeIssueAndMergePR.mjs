@@ -8,40 +8,45 @@ const octokit = new Octokit({
 async function run() {
     try {
         const pullRequest = context.payload.pull_request;
-        const { number: prNumber, merged, labels, head: { ref: branchName } } = pullRequest;
+        const { number: prNumber, merged, state, labels, head: { ref: branchName } } = pullRequest;
 
-        const rejectionLabels = ['wontfix', 'dcma', 'article-fault'];
-        const hasRejectionLabel = labels.some(label => rejectionLabels.includes(label.name));
+        if (state === 'closed' && !merged) {
+            console.log(`Pull request #${prNumber} is closed but not merged.`);
 
-        if (hasRejectionLabel) {
-            console.log(`Pull request #${prNumber} has one of the rejection labels: ${rejectionLabels.join(', ')}`);
+            const rejectionLabels = ['wontfix', 'dcma', 'article-fault'];
+            const hasRejectionLabel = labels.some(label => rejectionLabels.includes(label.name));
 
-            // Delete the branch
-            await octokit.git.deleteRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `heads/${branchName}`
-            });
-            console.log(`Branch ${branchName} deleted.`);
+            if (hasRejectionLabel) {
+                console.log(`Pull request #${prNumber} has one of the rejection labels: ${rejectionLabels.join(', ')}`);
 
-            // Close the PR
-            await octokit.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-                state: 'closed'
-            });
-            console.log(`Pull request #${prNumber} closed.`);
+                // Delete the branch
+                await octokit.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${branchName}`
+                });
+                console.log(`Branch ${branchName} deleted.`);
 
-            return; // Exit the script since deletion is prioritized
+                // Add a comment to the PR indicating it was closed due to rejection label
+                await octokit.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    body: `Pull request closed automatically due to rejection labels: ${rejectionLabels.join(', ')}.`
+                });
+
+                return; // Exit the script since deletion is prioritized
+            } else {
+                console.log(`Pull request #${prNumber} does not have rejection labels.`);
+            }
         }
 
         if (merged) {
             console.log(`Pull request #${prNumber} is merged.`);
 
-            const approvedLabel = labels.find(label => label.name === 'article-approved');
+            const approvedLabel = labels.find(label => label.name === 'article-merge-approved');
             if (approvedLabel) {
-                console.log(`Pull request #${prNumber} has the 'article-approved' label.`);
+                console.log(`Pull request #${prNumber} has the 'article-merge-approved' label.`);
 
                 // Get the issue number from the PR body
                 const issueNumber = extractIssueNumberFromPR(pullRequest.body);
@@ -65,7 +70,7 @@ async function run() {
                     console.error("Issue number could not be extracted from the PR body or is not a valid article template.");
                 }
             } else {
-                console.log(`Pull request #${prNumber} does not have the 'article-approved' label.`);
+                console.log(`Pull request #${prNumber} does not have the 'article-merge-approved' label.`);
             }
         } else {
             console.log(`Pull request #${prNumber} is not merged and does not have rejection labels.`);
