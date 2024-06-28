@@ -1,11 +1,11 @@
-name: Close Issue and Merge PR
+name: Close Issue and Handle PR
 
 on:
-  pull_request:
+  issues:
     types: [closed]
 
 jobs:
-  close-issue-and-merge-pr:
+  close-issue-and-handle-pr:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install octokit
-        run: npm install @octokit/rest
+      - name: Install dependencies
+        run: npm install @octokit/rest uuid
 
-      - name: Close Issue and Merge PR
+      - name: Handle Closed Issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node .github/scripts/closeIssueAndMergePR.mjs
+        run: node .github/scripts/closeIssueAndHandlePR.mjs
