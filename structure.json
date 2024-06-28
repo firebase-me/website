@@ -14,19 +14,6 @@
             "type": "dir",
             "children": [
               {
-                "name": "blocking_functions",
-                "path": "pages/services/authentication/blocking_functions",
-                "type": "dir",
-                "children": [
-                  {
-                    "name": "before_sign_in.md",
-                    "path": "pages/services/authentication/blocking_functions/before_sign_in.md",
-                    "type": "file",
-                    "children": []
-                  }
-                ]
-              },
-              {
                 "name": "custom_claims.md",
                 "path": "pages/services/authentication/custom_claims.md",
                 "type": "file",
@@ -107,6 +94,44 @@
                 "children": []
               }
             ]
+          },
+          {
+            "name": "cloud_functions",
+            "path": "pages/services/cloud_functions",
+            "type": "dir",
+            "children": [
+              {
+                "name": "blocking_functions",
+                "path": "pages/services/cloud_functions/blocking_functions",
+                "type": "dir",
+                "children": [
+                  {
+                    "name": "before_create.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/before_create.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "before_sign_in.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/before_sign_in.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "overview.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/overview.md",
+                    "type": "file",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "name": "manage_functions.md",
+                "path": "pages/services/cloud_functions/manage_functions.md",
+                "type": "file",
+                "children": []
+              }
+            ]
           }
         ]
       },
@@ -124,19 +149,6 @@
         "name": "new_updates",
         "type": "category",
         "children": []
-      },
-      {
-        "name": "cloud_function",
-        "path": "pages/services/cloud_function",
-        "type": "dir",
-        "children": [
-          {
-            "name": "manage_functions.md",
-            "path": "pages/services/cloud_function/manage_functions.md",
-            "type": "file",
-            "children": []
-          }
-        ]
       },
       {
         "name": "overview.md",
