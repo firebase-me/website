@@ -30,7 +30,7 @@ async function run() {
                 return;
             }
 
-            const branchUUID = uuidv4();
+            let branchUUID = uuidv4().replace(/-/g, '').substring(0, 10);
             const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
             const branchName = `article-new-${cleanArticleTitle}-${branchUUID}`;
 
@@ -265,8 +265,8 @@ function parseNewArticleIssue(body) {
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
+    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
