@@ -32,7 +32,7 @@ async function run() {
 
             const branchUUID = uuidv4();
             const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
-            const branchName = `article-new-${cleanArticleTitle}:${branchUUID}`;
+            const branchName = `article-new-${cleanArticleTitle}-${branchUUID}`;
 
             await createBranch(branchName);
 
@@ -61,7 +61,7 @@ async function run() {
             }
 
             const cleanArticleTitle = articleToChange.trim().replace(/\s+/g, '_').toLowerCase();
-            const branchName = `article-update-${cleanArticleTitle}:${branchUUID}`;
+            const branchName = `article-update-${cleanArticleTitle}-${branchUUID}`;
             await createBranch(branchName);
 
             // Update the article
@@ -244,7 +244,7 @@ async function getBranchUUID(issueNumber) {
 
     const botComment = comments.find(comment => comment.user.login === 'github-actions[bot]');
     if (botComment) {
-        const uuidMatch = botComment.body.match(/UUID: (article-(?:new|update)-[^:]+:[\w-]+)/);
+        const uuidMatch = botComment.body.match(/UUID: (article-(?:new|update)-[^-]+-[\w-]+)/);
         if (uuidMatch) {
             return uuidMatch[1];
         }
@@ -265,8 +265,8 @@ function parseNewArticleIssue(body) {
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
+    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
