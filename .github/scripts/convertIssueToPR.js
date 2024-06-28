@@ -13,7 +13,7 @@ async function run() {
     if (issue.labels.some(label => label.name === 'new-article')) {
         const [articleTitle, articleContent, articlePath] = parseNewArticleIssue(issue.body);
         if (!articleTitle || !articlePath) {
-            await addIssueComment(issue.number, 'Invalid article title or path.');
+            await updateIssueComment(issue.number, 'Invalid article title or path.');
             return;
         }
         const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
@@ -31,7 +31,7 @@ async function run() {
     if (issue.labels.some(label => label.name === 'change-request')) {
         const [articleToChange, linesToChange, proposedChanges] = parseIssueBody(issue.body);
         if (!articleToChange) {
-            await addIssueComment(issue.number, 'Invalid article path.');
+            await updateIssueComment(issue.number, 'Invalid article path.');
             return;
         }
         const branchName = `issue-${issue.number}-change-request`;
@@ -81,12 +81,14 @@ async function addNewArticle(issueNumber, branchName, articleTitle, articleConte
         content: Buffer.from(content).toString('base64'),
         branch: branchName
     });
+
+    await updateIssueComment(issueNumber, `New article created at path: ${filePath}`);
 }
 
 async function updateArticle(issueNumber, branchName, articlePath, linesToChange, proposedChanges) {
     const filePath = path.join('pages', articlePath);
     if (!fs.existsSync(filePath)) {
-        await addIssueComment(issueNumber, `File does not exist at path: ${filePath}`);
+        await updateIssueComment(issueNumber, `File does not exist at path: ${filePath}`);
         return;
     }
     const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -102,6 +104,8 @@ async function updateArticle(issueNumber, branchName, articlePath, linesToChange
         content: Buffer.from(updatedContent).toString('base64'),
         branch: branchName
     });
+
+    await updateIssueComment(issueNumber, `Article updated at path: ${filePath}`);
 }
 
 async function createOrUpdatePullRequest(title, branchName, issueNumber) {
@@ -131,12 +135,40 @@ async function createOrUpdatePullRequest(title, branchName, issueNumber) {
     }
 }
 
-async function addIssueComment(issueNumber, comment) {
-    await octokit.issues.createComment({
+async function updateIssueComment(issueNumber, comment) {
+    // Get existing comments on the issue
+    const { data: comments } = await octokit.issues.listComments({
         owner: context.repo.owner,
         repo: context.repo.repo,
-        issue_number: issueNumber,
-        body: comment
+        issue_number: issueNumber
+    });
+
+    // Find the bot's comment
+    let botComment = comments.find(comment => comment.user.login === 'github-actions[bot]');
+
+    if (botComment) {
+        // Update the existing comment
+        await octokit.issues.updateComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: botComment.id,
+            body: comment
+        });
+    } else {
+        // Create a new comment
+        botComment = await octokit.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+            body: comment
+        });
+    }
+
+    // Pin the bot comment (requires admin permissions)
+    await octokit.issues.pinIssueComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        comment_id: botComment.id
     });
 }
 
