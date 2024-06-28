@@ -37,7 +37,7 @@ async function run() {
             const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
             const branchName = `article-new-${cleanArticleTitle}-${branchUUID}`;
 
-            await createBranch(branchName);
+            await createOrUpdateBranch(branchName);
 
             // Add the new article
             await addNewArticle(issue.number, articleTitle, articleContent, articlePath, branchName);
@@ -65,7 +65,7 @@ async function run() {
 
             const cleanArticleTitle = articleToChange.trim().replace(/\s+/g, '_').toLowerCase();
             const branchName = `article-update-${cleanArticleTitle}-${branchUUID}`;
-            await createBranch(branchName);
+            await createOrUpdateBranch(branchName);
 
             // Update the article
             await updateArticle(issue.number, articleToChange, linesToChange, proposedChanges, branchName);
@@ -84,21 +84,34 @@ async function run() {
     }
 }
 
-async function createBranch(branchName) {
-    const mainRef = await octokit.git.getRef({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        ref: `heads/main`
-    });
+async function createOrUpdateBranch(branchName) {
+    try {
+        await octokit.git.getRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `heads/${branchName}`
+        });
+        console.log(`Branch ${branchName} already exists, no need to create it.`);
+    } catch (error) {
+        if (error.status === 404) {
+            const mainRef = await octokit.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/main`
+            });
 
-    await octokit.git.createRef({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        ref: `refs/heads/${branchName}`,
-        sha: mainRef.data.object.sha
-    });
+            await octokit.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/heads/${branchName}`,
+                sha: mainRef.data.object.sha
+            });
 
-    console.log(`Branch ${branchName} created`);
+            console.log(`Branch ${branchName} created`);
+        } else {
+            throw error;
+        }
+    }
 }
 
 async function addNewArticle(issueNumber, articleTitle, articleContent, articlePath, branchName) {
