@@ -171,6 +171,8 @@ function highlightNavPath() {
 
 // Function to find a button with a specific data-path in the navbar
 function findNavButtonByPath(path) {
+    if(path.startsWith('/'))
+        path = path.slice(1)
     const navButtons = document.querySelectorAll('#navbar button, #navbar a');
     for (const button of navButtons) {
         if (button.getAttribute('data-path') === path) {
