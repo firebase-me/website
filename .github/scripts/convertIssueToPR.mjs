@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 import { context } from "@actions/github";
 import fs from 'fs';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN
@@ -15,7 +16,10 @@ async function run() {
         const issue = context.payload.issue;
         console.log(`Processing issue #${issue.number}`);
 
-        if (issue.labels.some(label => label.name === 'new-article')) {
+        const isNewArticle = issue.labels.some(label => label.name === 'new-article');
+        const isChangeRequest = issue.labels.some(label => label.name === 'change-request');
+
+        if (isNewArticle) {
             console.log("New article detected");
             const [articleTitle, articleContent, articlePath] = parseNewArticleIssue(issue.body);
             console.log(`Parsed article title: ${articleTitle}`);
@@ -26,17 +30,20 @@ async function run() {
                 return;
             }
 
-            const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
+            const branchUUID = uuidv4();
+            const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
+            const branchName = `article-new-${cleanArticleTitle}:${branchUUID}`;
+
             await createBranch(branchName);
 
             // Add the new article
             await addNewArticle(issue.number, articleTitle, articleContent, articlePath, branchName);
 
             // Create or update the pull request
-            await createOrUpdatePullRequest(issue.title, branchName, issue.number);
+            await createOrUpdatePullRequest(issue.title, branchName, issue.number, branchUUID);
         }
 
-        if (issue.labels.some(label => label.name === 'change-request')) {
+        if (isChangeRequest) {
             console.log("Change request detected");
             const [articleToChange, linesToChange, proposedChanges] = parseIssueBody(issue.body);
             console.log(`Parsed article to change: ${articleToChange}`);
@@ -47,7 +54,14 @@ async function run() {
                 return;
             }
 
-            const branchName = `issue-${issue.number}-change-request`;
+            const branchUUID = await getBranchUUID(issue.number);
+            if (!branchUUID) {
+                console.error(`No branch UUID found for issue #${issue.number}`);
+                return;
+            }
+
+            const cleanArticleTitle = articleToChange.trim().replace(/\s+/g, '_').toLowerCase();
+            const branchName = `article-update-${cleanArticleTitle}:${branchUUID}`;
             await createBranch(branchName);
 
             // Update the article
@@ -56,7 +70,7 @@ async function run() {
             // Check if the issue is marked as ready for review
             if (issue.labels.some(label => label.name === 'ready-for-review')) {
                 // Create or update the pull request
-                await createOrUpdatePullRequest(issue.title, branchName, issue.number);
+                await createOrUpdatePullRequest(issue.title, branchName, issue.number, branchUUID);
             }
         }
 
@@ -109,7 +123,7 @@ async function addNewArticle(issueNumber, articleTitle, articleContent, articleP
         branch: branchName
     });
 
-    await updateIssueComment(issueNumber, `New article created at path: ${filePath}`);
+    await updateIssueComment(issueNumber, `New article created at path: ${filePath}\n\nUUID: ${branchName}`);
 }
 
 async function updateArticle(issueNumber, articlePath, linesToChange, proposedChanges, branchName) {
@@ -137,7 +151,7 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
             branch: branchName
         });
 
-        await updateIssueComment(issueNumber, `Placeholder file created at path: ${filePath}`);
+        await updateIssueComment(issueNumber, `Placeholder file created at path: ${filePath}\n\nUUID: ${branchName}`);
         return;
     }
     
@@ -156,10 +170,10 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
         branch: branchName
     });
 
-    await updateIssueComment(issueNumber, `Article updated at path: ${filePath}`);
+    await updateIssueComment(issueNumber, `Article updated at path: ${filePath}\n\nUUID: ${branchName}`);
 }
 
-async function createOrUpdatePullRequest(title, branchName, issueNumber) {
+async function createOrUpdatePullRequest(title, branchName, issueNumber, branchUUID) {
     const pulls = await octokit.pulls.list({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -183,7 +197,7 @@ async function createOrUpdatePullRequest(title, branchName, issueNumber) {
             title: `${title} (#${issueNumber})`,
             head: branchName,
             base: 'main',
-            body: `This PR addresses issue #${issueNumber}`
+            body: `This PR addresses issue #${issueNumber}\n\nUUID: ${branchUUID}`
         });
         console.log(`Pull request created for issue #${issueNumber}`);
     }
@@ -221,6 +235,24 @@ async function updateIssueComment(issueNumber, comment) {
     }
 }
 
+async function getBranchUUID(issueNumber) {
+    const { data: comments } = await octokit.issues.listComments({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: issueNumber
+    });
+
+    const botComment = comments.find(comment => comment.user.login === 'github-actions[bot]');
+    if (botComment) {
+        const uuidMatch = botComment.body.match(/UUID: (article-(?:new|update)-[^:]+:[\w-]+)/);
+        if (uuidMatch) {
+            return uuidMatch[1];
+        }
+    }
+
+    return null;
+}
+
 function parseNewArticleIssue(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
     const articleTitle = lines.find(line => line.startsWith('**Article Title**')).split(': ')[1];
@@ -232,9 +264,9 @@ function parseNewArticleIssue(body) {
 
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
-    const articleToChange = lines.find(line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
+    const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
+    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
