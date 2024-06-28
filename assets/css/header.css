@@ -1,49 +1,94 @@
-
+/* Styles for the header */
 .header {
     background-color: #333;
     color: white;
     padding: 10px;
+    border-bottom: 2px solid orangered;
     display: flex;
-    /* justify-content: center; */
-    /* align-items: center; */
-    flex-wrap: nowrap;
-    overflow-x: auto;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid orangered;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
-header .title {
+/* Styles for the title */
+.header .title {
     display: flex;
     align-items: center;
 }
+
+/* Styles for the menu row (categories and toggle button) */
+.header .menu-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-grow: 1; /* Ensure it takes the remaining space */
+}
+
+/* Styles for the categories container */
 .header .categories {
     display: flex;
     gap: 10px;
-    flex-wrap: nowrap;
-    /* Prevent wrapping */
-    overflow-x: auto;
-    /* Allow horizontal scrolling if necessary */
+    flex-wrap: nowrap; /* Prevent wrapping by default */
+    overflow-x:visible; /* Allow horizontal scrolling if necessary */
 }
 
+/* Styles for category buttons */
+.header button,
 .header .categories button {
-    white-space: nowrap;
-    /* Prevent text from wrapping inside the buttons */
-}
-
-.header button {
+    white-space: nowrap; /* Prevent text from wrapping inside the buttons */
     background-color: #575757;
+    height: 42px;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 0 20px; /* Ensure consistent padding, with vertical padding handled by height and line-height */
     cursor: pointer;
-    margin-right: 20px;
     font-weight: bold;
     font-size: 1.2em;
     text-transform: uppercase;
     transition: background-color 0.3s;
+    margin: 0; /* Remove margin */
+    display: flex; /* Use flexbox to center text */
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    line-height: 46px; /* Match line-height to height for vertical centering */
 }
-
 .header button:hover {
     background-color: gold;
+}
+
+/* Styles for the toggle button */
+.header .toggle-nav {
+    display: none; /* Hide by default */
+}
+
+/* Media query for mobile screens */
+@media  (max-width: 768px),
+(min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    .header {
+        flex-direction: column; /* Stack items vertically */
+        align-items: flex-start; /* Align items to the start */
+    }
+
+    .header .title {
+        width: 100%; /* Full width for the title */
+        margin-bottom: 10px; /* Space below the title */
+    }
+
+    .header .menu-row {
+        width: 100%; /* Full width for the menu row */
+        justify-content: space-between; /* Space between categories and toggle button */
+        align-items: center;
+    }
+
+    .header .categories {
+        width: auto; /* Auto width for categories */
+        flex-wrap: wrap; /* Allow wrapping */
+        justify-content: flex-start; /* Align buttons to the start */
+    }
+
+    .header .toggle-nav {
+        display: block; /* Show toggle button on mobile */
+        align-self: flex-end; /* Align to the end of the header */
+    }
 }
