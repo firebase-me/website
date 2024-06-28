@@ -18,7 +18,7 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      run: npm install @octokit/rest
+      run: npm install @octokit/rest @actions/github
 
     - name: Convert Issue to Pull Request
       env:
