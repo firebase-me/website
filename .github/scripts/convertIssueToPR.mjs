@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { getOctokit, context } from "@actions/github";
+import { context } from "@actions/github";
 import fs from 'fs';
 import path from 'path';
 
@@ -169,20 +169,13 @@ async function updateIssueComment(issueNumber, comment) {
         });
     } else {
         // Create a new comment
-        botComment = await octokit.issues.createComment({
+        await octokit.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: issueNumber,
             body: comment
         });
     }
-
-    // Pin the bot comment (requires admin permissions)
-    await octokit.issues.pinIssueComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        comment_id: botComment.id
-    });
 }
 
 function parseNewArticleIssue(body) {
@@ -196,9 +189,9 @@ function parseNewArticleIssue(body) {
 
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim());
-    const articleToChange = lines.find(line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
+    const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
+    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
