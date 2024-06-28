@@ -130,6 +130,24 @@
                 "path": "pages/services/cloud_functions/manage_functions.md",
                 "type": "file",
                 "children": []
+              },
+              {
+                "name": "on_call.md",
+                "path": "pages/services/cloud_functions/on_call.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "on_request.md",
+                "path": "pages/services/cloud_functions/on_request.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "overview.md",
+                "path": "pages/services/cloud_functions/overview.md",
+                "type": "file",
+                "children": []
               }
             ]
           }
@@ -229,6 +247,32 @@
           {
             "name": "Cloud_Messaging.md",
             "path": "pages/tutorials/flutter/Cloud_Messaging.md",
+            "type": "file",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "integrations",
+        "path": "pages/tutorials/integrations",
+        "type": "dir",
+        "children": [
+          {
+            "name": "flutterflow",
+            "path": "pages/tutorials/integrations/flutterflow",
+            "type": "dir",
+            "children": [
+              {
+                "name": "master_class.md",
+                "path": "pages/tutorials/integrations/flutterflow/master_class.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "overview.md",
+            "path": "pages/tutorials/integrations/overview.md",
             "type": "file",
             "children": []
           }
