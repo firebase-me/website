@@ -11,85 +11,68 @@ async function run() {
     const issue = context.payload.issue;
 
     if (issue.labels.some(label => label.name === 'new-article')) {
-        const [articleTitle, articleContent] = parseNewArticleIssue(issue.body);
-        const branchName = `issue-${issue.number}-new-article`;
+        const [articleTitle, articleContent, articlePath] = parseNewArticleIssue(issue.body);
+        if (!articleTitle || !articlePath) {
+            await addIssueComment(issue.number, 'Invalid article title or path.');
+            return;
+        }
+        const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
 
-        // Create a new branch
-        await createBranch(branchName);
+        // Create or update the branch
+        await createOrUpdateBranch(branchName);
 
         // Add the new article
-        await addNewArticle(issue.number, branchName, articleTitle, articleContent);
+        await addNewArticle(issue.number, branchName, articleTitle, articleContent, articlePath);
 
-        // Create a pull request
-        await createPullRequest(issue.title, branchName, issue.number);
+        // Create or update the pull request
+        await createOrUpdatePullRequest(issue.title, branchName, issue.number);
     }
 
     if (issue.labels.some(label => label.name === 'change-request')) {
         const [articleToChange, linesToChange, proposedChanges] = parseIssueBody(issue.body);
-        const branchName = `issue-${issue.number}`;
-
-        // Create or update a branch
-        try {
-            await octokit.git.getRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `heads/${branchName}`
-            });
-
-            // Update the branch
-            await updateBranch(issue.number, branchName, articleToChange, linesToChange, proposedChanges);
-        } catch {
-            // Create a new branch
-            await createBranch(branchName);
-
-            // Update the branch
-            await updateBranch(issue.number, branchName, articleToChange, linesToChange, proposedChanges);
+        if (!articleToChange) {
+            await addIssueComment(issue.number, 'Invalid article path.');
+            return;
         }
+        const branchName = `issue-${issue.number}-change-request`;
+
+        // Create or update the branch
+        await createOrUpdateBranch(branchName);
+
+        // Update the article
+        await updateArticle(issue.number, branchName, articleToChange, linesToChange, proposedChanges);
 
         // Check if the issue is marked as ready for review
         if (issue.labels.some(label => label.name === 'ready-for-review')) {
-            // Create a pull request
-            await createPullRequest(issue.title, branchName, issue.number);
+            // Create or update the pull request
+            await createOrUpdatePullRequest(issue.title, branchName, issue.number);
         }
     }
 }
 
-async function createBranch(branchName) {
-    await octokit.git.createRef({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        ref: `refs/heads/${branchName}`,
-        sha: context.sha
-    });
+async function createOrUpdateBranch(branchName) {
+    try {
+        await octokit.git.getRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `heads/${branchName}`
+        });
+    } catch {
+        await octokit.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `refs/heads/${branchName}`,
+            sha: context.sha
+        });
+    }
 }
 
-async function updateBranch(issueNumber, branchName, articleToChange, linesToChange, proposedChanges) {
-    const filePath = path.join('pages', articleToChange);
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const updatedContent = applyChanges(fileContent, linesToChange, proposedChanges);
-
-    // Write the updated content to the file
-    fs.writeFileSync(filePath, updatedContent);
-
-    // Commit and push the changes
-    await octokit.repos.createOrUpdateFileContents({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        path: filePath,
-        message: `Apply changes from issue #${issueNumber}`,
-        content: Buffer.from(updatedContent).toString('base64'),
-        branch: branchName
-    });
-}
-
-async function addNewArticle(issueNumber, branchName, articleTitle, articleContent) {
-    const filePath = path.join('pages', `${articleTitle.replace(/\s+/g, '_').toLowerCase()}.md`);
+async function addNewArticle(issueNumber, branchName, articleTitle, articleContent, articlePath) {
+    const filePath = path.join('pages', articlePath, `${articleTitle.replace(/\s+/g, '_').toLowerCase()}.md`);
     const content = `# ${articleTitle}\n\n${articleContent}`;
 
-    // Write the new content to the file
     fs.writeFileSync(filePath, content);
 
-    // Commit and push the changes
     await octokit.repos.createOrUpdateFileContents({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -100,23 +83,70 @@ async function addNewArticle(issueNumber, branchName, articleTitle, articleConte
     });
 }
 
-async function createPullRequest(title, branchName, issueNumber) {
-    await octokit.pulls.create({
+async function updateArticle(issueNumber, branchName, articlePath, linesToChange, proposedChanges) {
+    const filePath = path.join('pages', articlePath);
+    if (!fs.existsSync(filePath)) {
+        await addIssueComment(issueNumber, `File does not exist at path: ${filePath}`);
+        return;
+    }
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const updatedContent = applyChanges(fileContent, linesToChange, proposedChanges);
+
+    fs.writeFileSync(filePath, updatedContent);
+
+    await octokit.repos.createOrUpdateFileContents({
         owner: context.repo.owner,
         repo: context.repo.repo,
-        title: title,
-        head: branchName,
-        base: 'main',
-        body: `This PR addresses issue #${issueNumber}`
+        path: filePath,
+        message: `Apply changes from issue #${issueNumber}`,
+        content: Buffer.from(updatedContent).toString('base64'),
+        branch: branchName
+    });
+}
+
+async function createOrUpdatePullRequest(title, branchName, issueNumber) {
+    const pulls = await octokit.pulls.list({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        head: `${context.repo.owner}:${branchName}`
+    });
+
+    if (pulls.data.length === 0) {
+        await octokit.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            head: branchName,
+            base: 'main',
+            body: `This PR addresses issue #${issueNumber}`
+        });
+    } else {
+        const pull = pulls.data[0];
+        await octokit.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pull.number,
+            body: `This PR addresses issue #${issueNumber}`
+        });
+    }
+}
+
+async function addIssueComment(issueNumber, comment) {
+    await octokit.issues.createComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: issueNumber,
+        body: comment
     });
 }
 
 function parseNewArticleIssue(body) {
     const lines = body.split('\n').map(line => line.trim());
     const articleTitle = lines.find(line => line.startsWith('**Article Title**')).split(': ')[1];
+    const articlePath = lines.find(line => line.startsWith('**Article Path**')).split(': ')[1];
     const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Article Content**'));
     const articleContent = lines.slice(proposedChangesIndex + 1).join('\n').trim();
-    return [articleTitle, articleContent];
+    return [articleTitle, articleContent, articlePath];
 }
 
 function parseIssueBody(body) {
