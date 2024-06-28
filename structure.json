@@ -14,6 +14,12 @@
             "type": "dir",
             "children": [
               {
+                "name": "authentication_test_3.md",
+                "path": "pages/services/authentication/authentication_test_3.md",
+                "type": "file",
+                "children": []
+              },
+              {
                 "name": "authentication_test.md",
                 "path": "pages/services/authentication/authentication_test.md",
                 "type": "file",
