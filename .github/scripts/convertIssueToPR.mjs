@@ -26,11 +26,14 @@ async function run() {
                 return;
             }
 
+            const branchName = `issue-${issue.number}-new-article-${articleTitle.replace(/\s+/g, '_').toLowerCase()}`;
+            await createBranch(branchName);
+
             // Add the new article
-            await addNewArticle(issue.number, articleTitle, articleContent, articlePath);
+            await addNewArticle(issue.number, articleTitle, articleContent, articlePath, branchName);
 
             // Create or update the pull request
-            await createOrUpdatePullRequest(issue.title, issue.number);
+            await createOrUpdatePullRequest(issue.title, branchName, issue.number);
         }
 
         if (issue.labels.some(label => label.name === 'change-request')) {
@@ -44,13 +47,16 @@ async function run() {
                 return;
             }
 
+            const branchName = `issue-${issue.number}-change-request`;
+            await createBranch(branchName);
+
             // Update the article
-            await updateArticle(issue.number, articleToChange, linesToChange, proposedChanges);
+            await updateArticle(issue.number, articleToChange, linesToChange, proposedChanges, branchName);
 
             // Check if the issue is marked as ready for review
             if (issue.labels.some(label => label.name === 'ready-for-review')) {
                 // Create or update the pull request
-                await createOrUpdatePullRequest(issue.title, issue.number);
+                await createOrUpdatePullRequest(issue.title, branchName, issue.number);
             }
         }
 
@@ -61,7 +67,24 @@ async function run() {
     }
 }
 
-async function addNewArticle(issueNumber, articleTitle, articleContent, articlePath) {
+async function createBranch(branchName) {
+    const mainRef = await octokit.git.getRef({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        ref: `heads/main`
+    });
+
+    await octokit.git.createRef({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        ref: `refs/heads/${branchName}`,
+        sha: mainRef.data.object.sha
+    });
+
+    console.log(`Branch ${branchName} created`);
+}
+
+async function addNewArticle(issueNumber, articleTitle, articleContent, articlePath, branchName) {
     // Trim and normalize the path and title
     const cleanArticlePath = articlePath.trim().replace(/\s+/g, ' ');
     const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
@@ -83,13 +106,13 @@ async function addNewArticle(issueNumber, articleTitle, articleContent, articleP
         path: filePath,
         message: `Add new article from issue #${issueNumber}`,
         content: Buffer.from(content).toString('base64'),
-        branch: 'main' // Update directly in the main branch
+        branch: branchName
     });
 
     await updateIssueComment(issueNumber, `New article created at path: ${filePath}`);
 }
 
-async function updateArticle(issueNumber, articlePath, linesToChange, proposedChanges) {
+async function updateArticle(issueNumber, articlePath, linesToChange, proposedChanges, branchName) {
     const cleanArticlePath = articlePath.trim().replace(/\s+/g, ' ');
     const filePath = path.join('pages', cleanArticlePath);
     
@@ -111,7 +134,7 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
             path: filePath,
             message: `Create placeholder file from issue #${issueNumber}`,
             content: Buffer.from(placeholderContent).toString('base64'),
-            branch: 'main' // Update directly in the main branch
+            branch: branchName
         });
 
         await updateIssueComment(issueNumber, `Placeholder file created at path: ${filePath}`);
@@ -130,13 +153,13 @@ async function updateArticle(issueNumber, articlePath, linesToChange, proposedCh
         path: filePath,
         message: `Apply changes from issue #${issueNumber}`,
         content: Buffer.from(updatedContent).toString('base64'),
-        branch: 'main' // Update directly in the main branch
+        branch: branchName
     });
 
     await updateIssueComment(issueNumber, `Article updated at path: ${filePath}`);
 }
 
-async function createOrUpdatePullRequest(title, issueNumber) {
+async function createOrUpdatePullRequest(title, branchName, issueNumber) {
     const pulls = await octokit.pulls.list({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -144,7 +167,7 @@ async function createOrUpdatePullRequest(title, issueNumber) {
     });
 
     // Check if a PR already exists for the issue
-    let pullRequest = pulls.data.find(pr => pr.title.includes(`#${issueNumber}`));
+    let pullRequest = pulls.data.find(pr => pr.head.ref === branchName);
     if (pullRequest) {
         await octokit.pulls.update({
             owner: context.repo.owner,
@@ -158,7 +181,7 @@ async function createOrUpdatePullRequest(title, issueNumber) {
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: `${title} (#${issueNumber})`,
-            head: 'main',
+            head: branchName,
             base: 'main',
             body: `This PR addresses issue #${issueNumber}`
         });
@@ -209,9 +232,9 @@ function parseNewArticleIssue(body) {
 
 function parseIssueBody(body) {
     const lines = body.split('\n').map(line => line.trim().replace(/\s+/g, ' '));
-    const articleToChange = lines.find(line => line.startsWith('**Article to Change**')).split(': ')[1];
-    const linesToChange = lines.find(line => line.startsWith('**Line(s) to Change**')).split(': ')[1];
-    const proposedChangesIndex = lines.findIndex(line => line.startsWith('**Proposed Changes**'));
+    const articleToChange = lines.find(line.startsWith('**Article to Change**')).split(': ')[1];
+    const linesToChange = lines.find(line.startsWith('**Line(s) to Change**')).split(': ')[1];
+    const proposedChangesIndex = lines.findIndex(line.startsWith('**Proposed Changes**'));
     const proposedChanges = lines.slice(proposedChangesIndex + 1).join('\n').trim();
     return [articleToChange, linesToChange, proposedChanges];
 }
