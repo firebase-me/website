@@ -8,7 +8,33 @@ const octokit = new Octokit({
 async function run() {
     try {
         const pullRequest = context.payload.pull_request;
-        const { number: prNumber, merged, labels } = pullRequest;
+        const { number: prNumber, merged, labels, head: { ref: branchName } } = pullRequest;
+
+        const rejectionLabels = ['wontfix', 'dcma', 'article-fault'];
+        const hasRejectionLabel = labels.some(label => rejectionLabels.includes(label.name));
+
+        if (hasRejectionLabel) {
+            console.log(`Pull request #${prNumber} has one of the rejection labels: ${rejectionLabels.join(', ')}`);
+
+            // Delete the branch
+            await octokit.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branchName}`
+            });
+            console.log(`Branch ${branchName} deleted.`);
+
+            // Close the PR
+            await octokit.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                state: 'closed'
+            });
+            console.log(`Pull request #${prNumber} closed.`);
+
+            return; // Exit the script since deletion is prioritized
+        }
 
         if (merged) {
             console.log(`Pull request #${prNumber} is merged.`);
@@ -19,7 +45,7 @@ async function run() {
 
                 // Get the issue number from the PR body
                 const issueNumber = extractIssueNumberFromPR(pullRequest.body);
-                if (issueNumber && isValidArticleTemplate(issueNumber)) {
+                if (issueNumber && await isValidArticleTemplate(issueNumber)) {
                     await octokit.issues.update({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -42,7 +68,7 @@ async function run() {
                 console.log(`Pull request #${prNumber} does not have the 'article-approved' label.`);
             }
         } else {
-            console.log(`Pull request #${prNumber} is not merged.`);
+            console.log(`Pull request #${prNumber} is not merged and does not have rejection labels.`);
         }
 
         console.log("Script completed successfully");
