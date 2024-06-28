@@ -30,7 +30,7 @@ async function run() {
                 return;
             }
 
-            let branchUUID = uuidv4().replace(/-/g, '').substring(0, 10);
+            const branchUUID = await getBranchUUID(issue.number) || uuidv4().replace(/-/g, '').substring(0, 10);
             const cleanArticleTitle = articleTitle.trim().replace(/\s+/g, '_').toLowerCase();
             const branchName = `article-new-${cleanArticleTitle}-${branchUUID}`;
 
@@ -187,14 +187,14 @@ async function createOrUpdatePullRequest(title, branchName, issueNumber, branchU
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: pullRequest.number,
-            body: `This PR addresses issue #${issueNumber}`
+            body: `This PR addresses issue #${issueNumber}\n\nUUID: ${branchUUID}`
         });
         console.log(`Pull request updated for issue #${issueNumber}`);
     } else {
         pullRequest = await octokit.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: `${title} (#${issueNumber})`,
+            title: `${title} (#${issueNumber}) [UUID: ${branchUUID}]`,
             head: branchName,
             base: 'main',
             body: `This PR addresses issue #${issueNumber}\n\nUUID: ${branchUUID}`
@@ -244,7 +244,7 @@ async function getBranchUUID(issueNumber) {
 
     const botComment = comments.find(comment => comment.user.login === 'github-actions[bot]');
     if (botComment) {
-        const uuidMatch = botComment.body.match(/UUID: (article-(?:new|update)-[^-]+-[\w-]+)/);
+        const uuidMatch = botComment.body.match(/UUID: (article-(?:new|update)-[^-]+-\w+)/);
         if (uuidMatch) {
             return uuidMatch[1];
         }
