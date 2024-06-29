@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import yaml from 'js-yaml';
 import { Octokit } from "@octokit/rest";
 
@@ -17,24 +18,42 @@ const [owner, repo] = repository.split('/');
 const pathToFolder = 'pages';  // Update the directory to 'pages'
 const branch = 'main';  // Adjust the branch name if necessary
 
+
 async function fetchFolderStructure() {
+    function elevateItems(items) {
+        const overviewIndex = items.findIndex(item => item.name.startsWith('overview'));
+        if (overviewIndex !== -1) {
+            const [overviewItem] = items.splice(overviewIndex, 1);
+            items.unshift(overviewItem);
+        }
+        return items;
+    }
   const result = [];
   const stack = [{ path: pathToFolder, parent: result }];
 
   while (stack.length) {
-    const { path: currentPath, parent } = stack.pop();
+    let { path: currentPath, parent } = stack.pop();
     let contents;
 
     if (!useLocalBypass) {
-      const { data } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: currentPath
-      });
-      contents = data;
+      try {
+        const { data } = await octokit.repos.getContent({
+          owner,
+          repo,
+          path: currentPath
+        });
+        contents = data.map(item => ({
+          name: item.name,
+          path: item.path,
+          type: item.type
+        }));
+      } catch (error) {
+        console.error(`Failed to fetch contents from GitHub: ${error.message}`);
+        process.exit(1);
+      }
     } else {
       contents = fs.readdirSync(currentPath).map(name => {
-        const fullPath = `${currentPath}/${name}`;
+        const fullPath = path.join(currentPath, name);
         return {
           name,
           path: fullPath,
@@ -58,7 +77,7 @@ async function fetchFolderStructure() {
         });
         mapContent = Buffer.from(data.content, 'base64').toString('utf-8');
       } else {
-        mapContent = fs.readFileSync(`${currentPath}/map.yml`, 'utf-8');
+        mapContent = fs.readFileSync(path.join(currentPath, 'map.yml'), 'utf-8');
       }
       categoryOrder = yaml.load(mapContent);
     }
@@ -96,9 +115,12 @@ async function fetchFolderStructure() {
           stack.push({ path: item.path, parent: node.children });
         }
       });
+
+      // Ensure 'overview.md' is first within this category
+      categoryNode.children = elevateItems(categoryNode.children);
     }
 
-    // Process remaining items in alphabetical order
+    // Process remaining items
     const remainingItems = contents.filter(item => !assignedItems.has(item.name));
     remainingItems.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -122,6 +144,8 @@ async function fetchFolderStructure() {
         stack.push({ path: item.path, parent: node.children });
       }
     });
+
+    parent = elevateItems(parent);
   }
 
   const filePath = 'structure.json';

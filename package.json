@@ -3,12 +3,15 @@
     "version": "1.0.0",
     "main": ".github/scripts/fetchStructure.mjs",
     "scripts": {
-      "fetch-structure": "LOCAL_BYPASS=true node .github/scripts/fetchStructure.mjs"
+        "install-dependencies": "npm install",
+        "fetch-structure": "cross-env LOCAL_BYPASS=true node .github/scripts/fetchStructure.mjs"
     },
     "dependencies": {
-      "@octokit/rest": "^18.0.12",
-      "js-yaml": "^4.1.0"
+        "@octokit/rest": "^18.0.12",
+        "js-yaml": "^4.1.0"
     },
-    "type": "module"
-  }
-  
+    "type": "module",
+    "devDependencies": {
+        "cross-env": "^7.0.3"
+    }
+}
