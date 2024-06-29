@@ -1,10 +1,12 @@
-# Jekyll
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
+# Node.js related
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Logs and temp files
+logs/
 *.log
 *.tmp
 *.temp
@@ -12,6 +14,16 @@ _site/
 *.gz
 *.bz2
 *.sassc
+
+# Dependency directories
+jspm_packages/
+
+# Output directory for structure file
+structure.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
 
 # Bundler
 .bundle/

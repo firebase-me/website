@@ -1,0 +1,14 @@
+{
+    "name": "your-repo-name",
+    "version": "1.0.0",
+    "main": ".github/scripts/fetchStructure.mjs",
+    "scripts": {
+      "fetch-structure": "LOCAL_BYPASS=true node .github/scripts/fetchStructure.mjs"
+    },
+    "dependencies": {
+      "@octokit/rest": "^18.0.12",
+      "js-yaml": "^4.1.0"
+    },
+    "type": "module"
+  }
+  
