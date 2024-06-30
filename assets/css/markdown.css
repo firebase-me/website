@@ -32,7 +32,8 @@
 
 .code-container {
     margin-bottom: 20px;
-}.code-group {
+}
+.code-group {
     display: flex;
     flex-wrap: wrap; /* Allow children to wrap to the next line */
     align-items: center; /* Vertically center the h4 and select */
@@ -90,7 +91,7 @@ img {
 }
 
 pre {
-    white-space: nowrap; /* Prevent text wrapping */
+    /* white-space: nowrap; Prevent text wrapping */
     overflow: auto; /* Crop overflow content */
     text-overflow: ellipsis; /* Optionally add ellipsis to cropped content */
     padding:10px;
