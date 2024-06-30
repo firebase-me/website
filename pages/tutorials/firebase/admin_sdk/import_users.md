@@ -1,7 +1,7 @@
 
 # Comprehensive Guide: Importing and Authenticating Users in Firebase
 
-This guide will walk you through the process of importing users into Firebase Authentication using various password hashing algorithms, verifying their presence, and authenticating them via the REST API. We will cover:
+This guide will walk you through the process of importing users into Firebase Authentication using various password hashing algorithms, verifying their presence, and authenticating them via the REST API.
 
 1. **Firebase Import Settings**: Understanding plain text versus algorithm-based imports.
 2. **Generating Users**: Creating user data, which can be substituted for an import from another source.
