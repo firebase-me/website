@@ -7,24 +7,27 @@ function goto(dest, stub = false) {
     }
 
     let loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
-    if(!loc.startsWith('/')){
+    if (!loc.startsWith('/')) {
         loc = '/' + loc;
-    }if (loc.endsWith('/')) {
+    } if (loc.endsWith('/')) {
         loc = loc.slice(0, -1);
     }
     // this triggers redirect to load the page content
     console.log("GOTO:", loc,)
     if (window.location.origin.includes('localhost')) {
-        console.error("GOTO", "LOCALHOST", loc)
-        // history.replaceState(null, '', window.location.origin+ loc);
-        history.pushState(null, '',  window.location.origin+ loc);
+        console.error("GOTO", "LOCALHOST", loc);
+        // Ensure the loc does not start with a slash
+        const newLoc = loc.startsWith('/') ? loc.substring(1) : loc;
+        // Update the URL using replaceState for localhost
+        history.replaceState(null, '', `${window.location.origin}/index.html?path=${newLoc}`);
+    } else {
+        // Update the URL using pushState for production
+        history.pushState(null, '', `${window.location.origin}${loc}`);
     }
-    else {
-        history.pushState(null, '',  window.location.origin+ loc);
-    }
+    
     const source = findSource(dest)
     const cat = findCategory(source)
-    console.log("GOTO2",source, cat)
+    console.log("GOTO2", source, cat)
     current = source;
     loadContent(source);
     highlightNavPath();
@@ -171,7 +174,7 @@ function highlightNavPath() {
 
 // Function to find a button with a specific data-path in the navbar
 function findNavButtonByPath(path) {
-    if(path.startsWith('/'))
+    if (path.startsWith('/'))
         path = path.slice(1)
     const navButtons = document.querySelectorAll('#navbar button, #navbar a');
     for (const button of navButtons) {
