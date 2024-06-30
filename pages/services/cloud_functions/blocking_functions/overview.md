@@ -22,6 +22,21 @@ Firebase provides two main types of blocking functions:
      - Enforcing custom validation rules on user data.
      - Modifying user data before creation.
      - Blocking user creation based on custom criteria.
+   - **Example Implementation:** 
+     ```javascript
+     const functions = require('firebase-functions/v2');
+     const admin = require('firebase-admin');
+     admin.initializeApp();
+
+     exports.beforeCreate = functions.auth.user().beforeCreate((user, context) => {
+       if (!user.email.endsWith('@example.com')) {
+         throw new functions.auth.HttpsError(
+           'invalid-argument', 'Email domain not allowed.'
+         );
+       }
+       return { ...user, customClaims: { role: 'user' } };
+     });
+     ```
    - **Detailed Guide:** [Before Create Blocking Function](#)
 
 2. **Before Sign-In Blocking Function**
@@ -30,6 +45,21 @@ Firebase provides two main types of blocking functions:
      - Enforcing additional security checks.
      - Modifying user claims or tokens before sign-in.
      - Blocking sign-in based on custom criteria.
+   - **Example Implementation:** 
+     ```javascript
+     const functions = require('firebase-functions/v2');
+     const admin = require('firebase-admin');
+     admin.initializeApp();
+
+     exports.beforeSignIn = functions.auth.user().beforeSignIn((user, context) => {
+       if (user.emailVerified === false) {
+         throw new functions.auth.HttpsError(
+           'unauthenticated', 'Email not verified.'
+         );
+       }
+       return { ...user, lastLogin: new Date().toISOString() };
+     });
+     ```
    - **Detailed Guide:** [Before Sign-In Blocking Function](#)
 
 ### Summary

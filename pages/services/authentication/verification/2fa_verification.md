@@ -6,17 +6,15 @@ Two-Factor Authentication (2FA) adds an extra layer of security to user authenti
 
 2FA typically involves two steps:
 1. **Primary Authentication**: The user authenticates using their primary credentials (e.g., email and password).
-2. **Secondary Authentication**: The user verifies their identity using a second factor, such as a verification code sent to their phone or email.
+2. **Secondary Authentication**: The user verifies their identity using a second factor.
 
 ## Implementing 2FA with Firebase
 
-Firebase provides several ways to implement 2FA, including using SMS and email for sending verification codes.
-
-### Example: Implementing 2FA with SMS
+### Example: Implementing 2FA with Time-Based One-Time Password (TOTP)
 
 1. **Set Up Firebase Authentication**:
 
-    Ensure Firebase Authentication is set up for your project, and enable phone authentication in the Firebase console.
+    Ensure Firebase Authentication is set up for your project.
 
 2. **Primary Authentication**:
 
@@ -42,207 +40,152 @@ Firebase provides several ways to implement 2FA, including using SMS and email f
             const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
             console.log('User signed in:', userCredential.user.uid);
             // Proceed to secondary authentication (2FA)
-            await sendVerificationCode(userCredential.user.phoneNumber);
         } catch (error) {
             console.error('Error signing in:', error);
         }
     }
     ```
 
-3. **Send Verification Code**:
+3. **Generate TOTP Secret**:
 
-    Use Firebase's `verifyPhoneNumber` method to send a verification code to the user's phone.
+    Use a library like `otplib` to generate a TOTP secret for the user.
 
     ```javascript
-    async function sendVerificationCode(phoneNumber) {
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-        try {
-            const confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier);
-            console.log('Verification code sent to:', phoneNumber);
-            // Prompt the user to enter the verification code
-            const verificationCode = prompt('Enter the verification code');
-            await verifyCode(confirmationResult, verificationCode);
-        } catch (error) {
-            console.error('Error sending verification code:', error);
-        }
+    const otplib = require('otplib');
+
+    function generateTOTPSecret() {
+        const secret = otplib.authenticator.generateSecret();
+        console.log('TOTP Secret:', secret);
+        return secret;
     }
     ```
 
-4. **Verify the Code**:
+4. **Display QR Code**:
 
-    Verify the code entered by the user.
-
-    ```javascript
-    async function verifyCode(confirmationResult, verificationCode) {
-        try {
-            const result = await confirmationResult.confirm(verificationCode);
-            console.log('Phone number verified:', result.user.uid);
-            // User is fully authenticated
-        } catch (error) {
-            console.error('Error verifying code:', error);
-        }
-    }
-    ```
-
-### Example: Implementing 2FA with Email
-
-1. **Primary Authentication**:
-
-    Authenticate the user using their email and password as shown above.
-
-2. **Send Verification Code**:
-
-    Send a verification code to the user's email.
+    Display a QR code to the user for scanning with an authenticator app (like Google Authenticator).
 
     ```javascript
-    async function sendEmailVerification(user) {
-        try {
-            await user.sendEmailVerification();
-            console.log('Verification email sent to:', user.email);
-            // Prompt the user to check their email for the verification code
-        } catch (error) {
-            console.error('Error sending verification email:', error);
-        }
-    }
-    ```
+    const qrcode = require('qrcode');
 
-3. **Verify the Code**:
-
-    Verify the code entered by the user by checking the email link.
-
-    ```javascript
-    async function verifyEmail(user) {
-        try {
-            await user.reload();
-            if (user.emailVerified) {
-                console.log('Email verified:', user.uid);
-                // User is fully authenticated
-            } else {
-                console.error('Email not verified');
+    function generateQRCode(secret, user) {
+        const otpauth = otplib.authenticator.keyuri(user.email, 'YourApp', secret);
+        qrcode.toDataURL(otpauth, (err, imageUrl) => {
+            if (err) {
+                console.error('Error generating QR code:', err);
+                return;
             }
-        } catch (error) {
-            console.error('Error verifying email:', error);
+            console.log('QR Code URL:', imageUrl);
+            // Display the QR code to the user
+        });
+    }
+    ```
+
+5. **Verify TOTP Code**:
+
+    Verify the TOTP code entered by the user.
+
+    ```javascript
+    function verifyTOTPCode(secret, token) {
+        const isValid = otplib.authenticator.check(token, secret);
+        if (isValid) {
+            console.log('TOTP code verified');
+            // User is fully authenticated
+        } else {
+            console.error('Invalid TOTP code');
         }
     }
     ```
 
-## Out-of-Band (OOB) Code for Email Verification
+### Implementing 2FA with WebAuthn
 
-OOB codes are used for email verification in Firebase. When a user registers or changes their email, Firebase sends an OOB code to their email to verify their identity.
+WebAuthn provides strong, phishing-resistant authentication using public key cryptography.
 
-### Sending OOB Codes
+1. **Set Up Firebase Authentication**:
 
-Firebase provides built-in methods to send verification emails.
+    Ensure Firebase Authentication is set up for your project.
 
-```javascript
-async function sendEmailVerification(user) {
-    try {
-        await user.sendEmailVerification();
-        console.log('Verification email sent to:', user.email);
-    } catch (error) {
-        console.error('Error sending verification email:', error);
-    }
-}
-```
+2. **Primary Authentication**:
 
-### Custom Email Verification with OOB Codes
-
-To create custom email verification using OOB codes, you can use a Firebase Cloud Function.
-
-1. **Create a Cloud Function**:
+    Authenticate the user using their email and password.
 
     ```javascript
-    const functions = require('firebase-functions');
-    const admin = require('firebase-admin');
-    const nodemailer = require('nodemailer');
+    const firebase = require('firebase');
+    require('firebase/auth');
 
-    admin.initializeApp();
+    // Initialize Firebase
+    const firebaseConfig = {
+        apiKey: 'YOUR_API_KEY',
+        authDomain: 'YOUR_AUTH_DOMAIN',
+        projectId: 'YOUR_PROJECT_ID',
+        storageBucket: 'YOUR_STORAGE_BUCKET',
+        messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+        appId: 'YOUR_APP_ID'
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'your-email@gmail.com',
-            pass: 'your-email-password'
+    async function signInWithEmail(email, password) {
+        try {
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            console.log('User signed in:', userCredential.user.uid);
+            // Proceed to secondary authentication (2FA)
+        } catch (error) {
+            console.error('Error signing in:', error);
         }
-    });
+    }
+    ```
 
-    exports.sendCustomVerificationEmail = functions.auth.user().onCreate((user) => {
-        const oobCode = user.oobCode; // Get OOB code
-        const email = user.email;
+3. **Register a WebAuthn Credential**:
 
-        const mailOptions = {
-            from: 'your-email@gmail.com',
-            to: email,
-            subject: 'Verify your email',
-            text: `Please verify your email by clicking on the following link: ${oobCode}`
+    Use the WebAuthn API to register a credential for the user.
+
+    ```javascript
+    async function registerWebAuthn() {
+        const publicKey = {
+            // The challenge is typically generated by the server
+            challenge: new Uint8Array([/* ... */]),
+            rp: { name: "Your App" },
+            user: {
+                id: new Uint8Array([/* ... */]),
+                name: "user@example.com",
+                displayName: "User Example"
+            },
+            pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+            attestation: "direct",
+            timeout: 60000,
+            authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+            }
         };
 
-        return transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log('Error sending email:', error);
-            }
-            console.log('Email sent:', info.response);
-        });
-    });
+        const credential = await navigator.credentials.create({ publicKey });
+        console.log('WebAuthn credential:', credential);
+        // Send the credential to the server to be verified and stored
+    }
     ```
 
-2. **Validate OOB Codes**:
+4. **Authenticate with WebAuthn**:
 
-    Ensure the OOB codes are validated when the user clicks the link.
+    Use the WebAuthn API to authenticate the user.
 
     ```javascript
-    const functions = require('firebase-functions');
-    const admin = require('firebase-admin');
+    async function authenticateWebAuthn() {
+        const publicKey = {
+            // The challenge is typically generated by the server
+            challenge: new Uint8Array([/* ... */]),
+            allowCredentials: [{
+                id: new Uint8Array([/* ... */]),
+                type: "public-key"
+            }],
+            timeout: 60000,
+            userVerification: "required"
+        };
 
-    admin.initializeApp();
-
-    exports.verifyEmail = functions.https.onRequest(async (req, res) => {
-        const oobCode = req.query.oobCode;
-        try {
-            await admin.auth().updateUserByOobCode(oobCode);
-            res.send('Email verified successfully');
-        } catch (error) {
-            console.error('Error verifying email:', error);
-            res.status(400).send('Invalid or expired OOB code');
-        }
-    });
+        const assertion = await navigator.credentials.get({ publicKey });
+        console.log('WebAuthn assertion:', assertion);
+        // Send the assertion to the server to be verified
+    }
     ```
-
-## Domain Validation to Prevent Emails from Going to Spam
-
-To prevent emails from going to spam, validate your domain by setting up SPF, DKIM, and DMARC records.
-
-1. **SPF Record**:
-
-    Add an SPF record to your DNS settings to specify which mail servers are allowed to send emails on behalf of your domain.
-
-    ```
-    v=spf1 include:_spf.google.com ~all
-    ```
-
-2. **DKIM Record**:
-
-    Configure DKIM to add a digital signature to your emails, verifying that they are from your domain.
-
-    ```
-    v=DKIM1; k=rsa; p=your-public-key
-    ```
-
-3. **DMARC Record**:
-
-    Add a DMARC record to help email providers determine how to handle emails that fail SPF or DKIM checks.
-
-    ```
-    v=DMARC1; p=none; rua=mailto:your-email@your-domain.com
-    ```
-
-## Recommended Email Providers
-
-Here are some recommended email providers to use for sending verification emails:
-
-1. **SendGrid**: A popular email service provider that offers a free tier and is easy to integrate with Firebase.
-2. **Mailgun**: Another reliable email service provider with a flexible API and robust features.
-3. **Amazon SES**: A scalable and cost-effective email service provided by AWS.
 
 ## Common Caveats
 
@@ -254,31 +197,32 @@ Here are some recommended email providers to use for sending verification emails
 
 2. **Fallback Options**:
 
-    Provide fallback options in case the primary 2FA method fails. For instance, if the user cannot receive an SMS, allow them to receive a code via email.
+    Provide fallback options in case the primary 2FA method fails. For instance, if WebAuthn fails, allow users to use TOTP.
 
 ### Security Concerns
 
-1. **Phone Number Recycling**:
+1. **Device Security**:
 
-    Phone numbers can be recycled, which might lead to security issues if the new owner of the phone number gains access to the previous owner's accounts. Encourage users to update their phone numbers regularly.
+    WebAuthn relies on the security of the user's device. Encourage users to secure their devices with strong passwords and up-to-date security measures.
 
 2. **Phishing Attacks**:
 
-    Educate users about phishing attacks where attackers might trick them into providing their verification codes. Implement additional security measures, such as monitoring login locations.
+    Educate users about phishing attacks where attackers might trick them into providing their second factor. Implement additional security measures, such as monitoring login locations.
 
 ### Technical Issues
 
-1. **Delivery Failures**:
+1. **Browser Compatibility**:
 
-    Sometimes, SMS or email delivery might fail due to various reasons. Implement retries and provide users with clear instructions on what to do if they do not receive their verification codes.
+    Ensure that your implementation works across different browsers and devices, especially for WebAuthn.
 
-1. **Rate limiting**:
+2. **Usability**:
 
-    Implement rate limiting to prevent abuse of the 2FA system. Limit the number of verification codes that can be sent to a single user within a specific timeframe.
+    Provide clear instructions and support for users setting up and using 2FA methods.
 
 ## Additional Resources
 
 For more information, you can refer to the following resources:
 - [Firebase Authentication Documentation](https://firebase.google.com/docs/auth)
 - [Firebase Admin SDK Documentation](https://firebase.google.com/docs/admin/setup)
-- [Firebase Security Rules Documentation](https://firebase.google.com/docs/rules)
+- [WebAuthn API Documentation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
+- [otplib Documentation](https://github.com/yeojz/otplib)

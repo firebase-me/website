@@ -61,12 +61,6 @@
                     "children": []
                   },
                   {
-                    "name": "custom.md",
-                    "path": "pages/services/authentication/verification/custom.md",
-                    "type": "file",
-                    "children": []
-                  },
-                  {
                     "name": "email_verification.md",
                     "path": "pages/services/authentication/verification/email_verification.md",
                     "type": "file",
@@ -154,6 +148,67 @@
                 "path": "pages/services/cloud_functions/on_request.md",
                 "type": "file",
                 "children": []
+              },
+              {
+                "name": "triggers",
+                "path": "pages/services/cloud_functions/triggers",
+                "type": "dir",
+                "children": [
+                  {
+                    "name": "analytics.md",
+                    "path": "pages/services/cloud_functions/triggers/analytics.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "authentication.md",
+                    "path": "pages/services/cloud_functions/triggers/authentication.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "firestore.md",
+                    "path": "pages/services/cloud_functions/triggers/firestore.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "pub_sub.md",
+                    "path": "pages/services/cloud_functions/triggers/pub_sub.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "realtime.md",
+                    "path": "pages/services/cloud_functions/triggers/realtime.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "remote_config.md",
+                    "path": "pages/services/cloud_functions/triggers/remote_config.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "storage.md",
+                    "path": "pages/services/cloud_functions/triggers/storage.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "task_queue.md",
+                    "path": "pages/services/cloud_functions/triggers/task_queue.md",
+                    "type": "file",
+                    "children": []
+                  },
+                  {
+                    "name": "test_lab.md",
+                    "path": "pages/services/cloud_functions/triggers/test_lab.md",
+                    "type": "file",
+                    "children": []
+                  }
+                ]
               }
             ]
           }
