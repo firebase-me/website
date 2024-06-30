@@ -15,7 +15,6 @@ logs/
 *.gz
 *.bz2
 *.sassc
-structure.json
 
 # Dependency directories
 jspm_packages/
