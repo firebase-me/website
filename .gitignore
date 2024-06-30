@@ -15,6 +15,7 @@ logs/
 *.gz
 *.bz2
 *.sassc
+structure.json
 
 # Dependency directories
 jspm_packages/
@@ -37,3 +38,4 @@ _config_secrets.yml
 # IDEs and editors
 .vscode/
 .idea/
+structure.json
