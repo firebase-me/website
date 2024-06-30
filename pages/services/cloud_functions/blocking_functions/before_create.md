@@ -1,15 +1,14 @@
+# Before Create Blocking Function
 
-### Before Create Blocking Function
-
-#### Introduction
+## Introduction
 The Before Create Blocking Function in Firebase allows you to intercept and modify the user creation process before it is completed. This function is useful for enforcing custom validation rules, modifying user data before creation, and blocking user creation based on custom criteria.
 
-#### Use Cases
+## Use Cases
 1. **Custom Validation:** Enforce specific validation rules for user data during the creation process.
 2. **Modify User Data:** Adjust user data before it is written to Firebase Authentication.
 3. **Block User Creation:** Prevent user creation based on criteria such as email domain restrictions or other custom rules.
 
-#### Example Implementation
+## Example Implementation
 Here is an example of a Before Create Blocking Function that checks if the user's email domain is allowed and blocks creation if it is not:
 
 ```javascript
@@ -29,7 +28,7 @@ exports.beforeCreate = functions.auth.user().beforeCreate((user, context) => {
 });
 ```
 
-#### Event Structure
+## Event Structure
 The Before Create event structure provides detailed information about the user creation attempt. Here is an example of the event structure and the data it contains, represented as a TypeScript interface:
 
 ```typescript
@@ -78,7 +77,7 @@ interface BeforeCreateEvent {
 }
 ```
 
-#### Caveats
+## Caveats
 - **Null Properties:** Certain properties may be `null` if not available or applicable, such as `profile`, `username`, `recaptchaScore`, `displayName`, `photoURL`, `phoneNumber`, `passwordHash`, `passwordSalt`, `customClaims`, `tenantId`, `tokensValidAfterTime`, and `multiFactor`.
 - **Provider Data:** This is an array containing provider-specific information, represented as `[Object]` for brevity but can contain multiple entries depending on the user's linked providers.
 
