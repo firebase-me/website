@@ -1,12 +1,12 @@
 [
   {
     "name": "services",
-    "path": "pages\\services",
+    "path": "pages/services",
     "type": "dir",
     "children": [
       {
         "name": "overview.md",
-        "path": "pages\\services\\overview.md",
+        "path": "pages/services/overview.md",
         "type": "file",
         "children": []
       },
@@ -16,71 +16,65 @@
         "children": [
           {
             "name": "authentication",
-            "path": "pages\\services\\authentication",
+            "path": "pages/services/authentication",
             "type": "dir",
             "children": [
               {
-                "name": "admin_sdk",
-                "path": "pages\\services\\authentication\\admin_sdk",
-                "type": "dir",
-                "children": []
-              },
-              {
                 "name": "custom_claims.md",
-                "path": "pages\\services\\authentication\\custom_claims.md",
+                "path": "pages/services/authentication/custom_claims.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "custom_tokens.md",
-                "path": "pages\\services\\authentication\\custom_tokens.md",
+                "path": "pages/services/authentication/custom_tokens.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "linking.md",
-                "path": "pages\\services\\authentication\\linking.md",
+                "path": "pages/services/authentication/linking.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "providers.md",
-                "path": "pages\\services\\authentication\\providers.md",
+                "path": "pages/services/authentication/providers.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "username.md",
-                "path": "pages\\services\\authentication\\username.md",
+                "path": "pages/services/authentication/username.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "verification",
-                "path": "pages\\services\\authentication\\verification",
+                "path": "pages/services/authentication/verification",
                 "type": "dir",
                 "children": [
                   {
                     "name": "2fa_verification.md",
-                    "path": "pages\\services\\authentication\\verification\\2fa_verification.md",
+                    "path": "pages/services/authentication/verification/2fa_verification.md",
                     "type": "file",
                     "children": []
                   },
                   {
                     "name": "custom.md",
-                    "path": "pages\\services\\authentication\\verification\\custom.md",
+                    "path": "pages/services/authentication/verification/custom.md",
                     "type": "file",
                     "children": []
                   },
                   {
                     "name": "email_verification.md",
-                    "path": "pages\\services\\authentication\\verification\\email_verification.md",
+                    "path": "pages/services/authentication/verification/email_verification.md",
                     "type": "file",
                     "children": []
                   },
                   {
                     "name": "sms_verification.md",
-                    "path": "pages\\services\\authentication\\verification\\sms_verification.md",
+                    "path": "pages/services/authentication/verification/sms_verification.md",
                     "type": "file",
                     "children": []
                   }
@@ -90,60 +84,54 @@
           },
           {
             "name": "firestore",
-            "path": "pages\\services\\firestore",
+            "path": "pages/services/firestore",
             "type": "dir",
             "children": [
               {
                 "name": "firestore_reads.md",
-                "path": "pages\\services\\firestore\\firestore_reads.md",
+                "path": "pages/services/firestore/firestore_reads.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "firestore_writes.md",
-                "path": "pages\\services\\firestore\\firestore_writes.md",
+                "path": "pages/services/firestore/firestore_writes.md",
                 "type": "file",
-                "children": []
-              },
-              {
-                "name": "security_rules",
-                "path": "pages\\services\\firestore\\security_rules",
-                "type": "dir",
                 "children": []
               }
             ]
           },
           {
             "name": "cloud_functions",
-            "path": "pages\\services\\cloud_functions",
+            "path": "pages/services/cloud_functions",
             "type": "dir",
             "children": [
               {
                 "name": "overview.md",
-                "path": "pages\\services\\cloud_functions\\overview.md",
+                "path": "pages/services/cloud_functions/overview.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "blocking_functions",
-                "path": "pages\\services\\cloud_functions\\blocking_functions",
+                "path": "pages/services/cloud_functions/blocking_functions",
                 "type": "dir",
                 "children": [
                   {
                     "name": "overview.md",
-                    "path": "pages\\services\\cloud_functions\\blocking_functions\\overview.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/overview.md",
                     "type": "file",
                     "children": []
                   },
                   {
                     "name": "before_create.md",
-                    "path": "pages\\services\\cloud_functions\\blocking_functions\\before_create.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/before_create.md",
                     "type": "file",
                     "children": []
                   },
                   {
                     "name": "before_sign_in.md",
-                    "path": "pages\\services\\cloud_functions\\blocking_functions\\before_sign_in.md",
+                    "path": "pages/services/cloud_functions/blocking_functions/before_sign_in.md",
                     "type": "file",
                     "children": []
                   }
@@ -151,26 +139,20 @@
               },
               {
                 "name": "manage_functions.md",
-                "path": "pages\\services\\cloud_functions\\manage_functions.md",
+                "path": "pages/services/cloud_functions/manage_functions.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "on_call.md",
-                "path": "pages\\services\\cloud_functions\\on_call.md",
+                "path": "pages/services/cloud_functions/on_call.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "on_request.md",
-                "path": "pages\\services\\cloud_functions\\on_request.md",
+                "path": "pages/services/cloud_functions/on_request.md",
                 "type": "file",
-                "children": []
-              },
-              {
-                "name": "triggers",
-                "path": "pages\\services\\cloud_functions\\triggers",
-                "type": "dir",
                 "children": []
               }
             ]
@@ -191,33 +173,27 @@
         "name": "new_updates",
         "type": "category",
         "children": []
-      },
-      {
-        "name": "realtime_DB",
-        "path": "pages\\services\\realtime_DB",
-        "type": "dir",
-        "children": []
       }
     ]
   },
   {
     "name": "tutorials",
-    "path": "pages\\tutorials",
+    "path": "pages/tutorials",
     "type": "dir",
     "children": [
       {
         "name": "firebase",
-        "path": "pages\\tutorials\\firebase",
+        "path": "pages/tutorials/firebase",
         "type": "dir",
         "children": [
           {
             "name": "admin_sdk",
-            "path": "pages\\tutorials\\firebase\\admin_sdk",
+            "path": "pages/tutorials/firebase/admin_sdk",
             "type": "dir",
             "children": [
               {
                 "name": "import_users.md",
-                "path": "pages\\tutorials\\firebase\\admin_sdk\\import_users.md",
+                "path": "pages/tutorials/firebase/admin_sdk/import_users.md",
                 "type": "file",
                 "children": []
               }
@@ -225,18 +201,18 @@
           },
           {
             "name": "app_features",
-            "path": "pages\\tutorials\\firebase\\app_features",
+            "path": "pages/tutorials/firebase/app_features",
             "type": "dir",
             "children": [
               {
                 "name": "Account_Linking_Guide.md",
-                "path": "pages\\tutorials\\firebase\\app_features\\Account_Linking_Guide.md",
+                "path": "pages/tutorials/firebase/app_features/Account_Linking_Guide.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "Public_User_Profiles.md",
-                "path": "pages\\tutorials\\firebase\\app_features\\Public_User_Profiles.md",
+                "path": "pages/tutorials/firebase/app_features/Public_User_Profiles.md",
                 "type": "file",
                 "children": []
               }
@@ -244,18 +220,18 @@
           },
           {
             "name": "firestore",
-            "path": "pages\\tutorials\\firebase\\firestore",
+            "path": "pages/tutorials/firebase/firestore",
             "type": "dir",
             "children": [
               {
                 "name": "design with firestore.md",
-                "path": "pages\\tutorials\\firebase\\firestore\\design with firestore.md",
+                "path": "pages/tutorials/firebase/firestore/design with firestore.md",
                 "type": "file",
                 "children": []
               },
               {
                 "name": "only documents exist.md",
-                "path": "pages\\tutorials\\firebase\\firestore\\only documents exist.md",
+                "path": "pages/tutorials/firebase/firestore/only documents exist.md",
                 "type": "file",
                 "children": []
               }
@@ -265,12 +241,12 @@
       },
       {
         "name": "flutter",
-        "path": "pages\\tutorials\\flutter",
+        "path": "pages/tutorials/flutter",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\flutter\\Cloud_Messaging.md",
+            "path": "pages/tutorials/flutter/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -278,23 +254,23 @@
       },
       {
         "name": "integrations",
-        "path": "pages\\tutorials\\integrations",
+        "path": "pages/tutorials/integrations",
         "type": "dir",
         "children": [
           {
             "name": "overview.md",
-            "path": "pages\\tutorials\\integrations\\overview.md",
+            "path": "pages/tutorials/integrations/overview.md",
             "type": "file",
             "children": []
           },
           {
             "name": "flutterflow",
-            "path": "pages\\tutorials\\integrations\\flutterflow",
+            "path": "pages/tutorials/integrations/flutterflow",
             "type": "dir",
             "children": [
               {
                 "name": "master_class.md",
-                "path": "pages\\tutorials\\integrations\\flutterflow\\master_class.md",
+                "path": "pages/tutorials/integrations/flutterflow/master_class.md",
                 "type": "file",
                 "children": []
               }
@@ -304,12 +280,12 @@
       },
       {
         "name": "ios-swift",
-        "path": "pages\\tutorials\\ios-swift",
+        "path": "pages/tutorials/ios-swift",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\ios-swift\\Cloud_Messaging.md",
+            "path": "pages/tutorials/ios-swift/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -317,18 +293,18 @@
       },
       {
         "name": "misc",
-        "path": "pages\\tutorials\\misc",
+        "path": "pages/tutorials/misc",
         "type": "dir",
         "children": [
           {
             "name": "code_snippets.md",
-            "path": "pages\\tutorials\\misc\\code_snippets.md",
+            "path": "pages/tutorials/misc/code_snippets.md",
             "type": "file",
             "children": []
           },
           {
             "name": "common_tools.md",
-            "path": "pages\\tutorials\\misc\\common_tools.md",
+            "path": "pages/tutorials/misc/common_tools.md",
             "type": "file",
             "children": []
           }
@@ -336,12 +312,12 @@
       },
       {
         "name": "node",
-        "path": "pages\\tutorials\\node",
+        "path": "pages/tutorials/node",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\node\\Cloud_Messaging.md",
+            "path": "pages/tutorials/node/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -349,12 +325,12 @@
       },
       {
         "name": "python",
-        "path": "pages\\tutorials\\python",
+        "path": "pages/tutorials/python",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\python\\Cloud_Messaging.md",
+            "path": "pages/tutorials/python/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -362,12 +338,12 @@
       },
       {
         "name": "react",
-        "path": "pages\\tutorials\\react",
+        "path": "pages/tutorials/react",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\react\\Cloud_Messaging.md",
+            "path": "pages/tutorials/react/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -375,12 +351,12 @@
       },
       {
         "name": "react-native",
-        "path": "pages\\tutorials\\react-native",
+        "path": "pages/tutorials/react-native",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\react-native\\Cloud_Messaging.md",
+            "path": "pages/tutorials/react-native/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
@@ -388,12 +364,12 @@
       },
       {
         "name": "vue",
-        "path": "pages\\tutorials\\vue",
+        "path": "pages/tutorials/vue",
         "type": "dir",
         "children": [
           {
             "name": "Cloud_Messaging.md",
-            "path": "pages\\tutorials\\vue\\Cloud_Messaging.md",
+            "path": "pages/tutorials/vue/Cloud_Messaging.md",
             "type": "file",
             "children": []
           }
