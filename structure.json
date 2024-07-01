@@ -82,6 +82,18 @@
             "type": "dir",
             "children": [
               {
+                "name": "overview.md",
+                "path": "pages/services/firestore/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "additional.md",
+                "path": "pages/services/firestore/additional.md",
+                "type": "file",
+                "children": []
+              },
+              {
                 "name": "firestore_reads.md",
                 "path": "pages/services/firestore/firestore_reads.md",
                 "type": "file",
@@ -90,6 +102,18 @@
               {
                 "name": "firestore_writes.md",
                 "path": "pages/services/firestore/firestore_writes.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "read_data.md",
+                "path": "pages/services/firestore/read_data.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "write_data.md",
+                "path": "pages/services/firestore/write_data.md",
                 "type": "file",
                 "children": []
               }
@@ -217,17 +241,204 @@
       {
         "name": "monitor",
         "type": "category",
-        "children": []
+        "children": [
+          {
+            "name": "crashlytics",
+            "path": "pages/services/crashlytics",
+            "type": "dir",
+            "children": [
+              {
+                "name": "overview.md",
+                "path": "pages/services/crashlytics/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "best_practices.md",
+                "path": "pages/services/crashlytics/best_practices.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "custom_logs.md",
+                "path": "pages/services/crashlytics/custom_logs.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "debugging.md",
+                "path": "pages/services/crashlytics/debugging.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "nonfatal_exemptions.md",
+                "path": "pages/services/crashlytics/nonfatal_exemptions.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "setup.md",
+                "path": "pages/services/crashlytics/setup.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "user_identification.md",
+                "path": "pages/services/crashlytics/user_identification.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "monitoring",
+            "path": "pages/services/monitoring",
+            "type": "dir",
+            "children": [
+              {
+                "name": "overview.md",
+                "path": "pages/services/monitoring/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "app_distribution.md",
+                "path": "pages/services/monitoring/app_distribution.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "remote_config.md",
+                "path": "pages/services/monitoring/remote_config.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "test_lab.md",
+                "path": "pages/services/monitoring/test_lab.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          }
+        ]
       },
       {
         "name": "engage",
         "type": "category",
-        "children": []
+        "children": [
+          {
+            "name": "cloud_messaging",
+            "path": "pages/services/cloud_messaging",
+            "type": "dir",
+            "children": [
+              {
+                "name": "overview.md",
+                "path": "pages/services/cloud_messaging/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "best_use.md",
+                "path": "pages/services/cloud_messaging/best_use.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "caveats.md",
+                "path": "pages/services/cloud_messaging/caveats.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "implimentatons.md",
+                "path": "pages/services/cloud_messaging/implimentatons.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "google_analytics",
+            "path": "pages/services/google_analytics",
+            "type": "dir",
+            "children": [
+              {
+                "name": "overview.md",
+                "path": "pages/services/google_analytics/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "additional.md",
+                "path": "pages/services/google_analytics/additional.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "audience.md",
+                "path": "pages/services/google_analytics/audience.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "custom_events.md",
+                "path": "pages/services/google_analytics/custom_events.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "integrations.md",
+                "path": "pages/services/google_analytics/integrations.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "managment.md",
+                "path": "pages/services/google_analytics/managment.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          }
+        ]
       },
       {
         "name": "new_updates",
         "type": "category",
         "children": []
+      },
+      {
+        "name": "realtime_DB",
+        "path": "pages/services/realtime_DB",
+        "type": "dir",
+        "children": [
+          {
+            "name": "overview.md",
+            "path": "pages/services/realtime_DB/overview.md",
+            "type": "file",
+            "children": []
+          },
+          {
+            "name": "additional.md",
+            "path": "pages/services/realtime_DB/additional.md",
+            "type": "file",
+            "children": []
+          },
+          {
+            "name": "read_data.md",
+            "path": "pages/services/realtime_DB/read_data.md",
+            "type": "file",
+            "children": []
+          },
+          {
+            "name": "write_data.md",
+            "path": "pages/services/realtime_DB/write_data.md",
+            "type": "file",
+            "children": []
+          }
+        ]
       }
     ]
   },
