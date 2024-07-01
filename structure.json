@@ -410,31 +410,31 @@
         "children": []
       },
       {
-        "name": "realtime_DB",
-        "path": "pages/services/realtime_DB",
+        "name": "realtime_",
+        "path": "pages/services/realtime_",
         "type": "dir",
         "children": [
           {
             "name": "overview.md",
-            "path": "pages/services/realtime_DB/overview.md",
+            "path": "pages/services/realtime_/overview.md",
             "type": "file",
             "children": []
           },
           {
             "name": "additional.md",
-            "path": "pages/services/realtime_DB/additional.md",
+            "path": "pages/services/realtime_/additional.md",
             "type": "file",
             "children": []
           },
           {
             "name": "read_data.md",
-            "path": "pages/services/realtime_DB/read_data.md",
+            "path": "pages/services/realtime_/read_data.md",
             "type": "file",
             "children": []
           },
           {
             "name": "write_data.md",
-            "path": "pages/services/realtime_DB/write_data.md",
+            "path": "pages/services/realtime_/write_data.md",
             "type": "file",
             "children": []
           }
