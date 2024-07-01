@@ -120,6 +120,37 @@
             ]
           },
           {
+            "name": "realtime_db",
+            "path": "pages/services/realtime_db",
+            "type": "dir",
+            "children": [
+              {
+                "name": "overview.md",
+                "path": "pages/services/realtime_db/overview.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "additional.md",
+                "path": "pages/services/realtime_db/additional.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "read_data.md",
+                "path": "pages/services/realtime_db/read_data.md",
+                "type": "file",
+                "children": []
+              },
+              {
+                "name": "write_data.md",
+                "path": "pages/services/realtime_db/write_data.md",
+                "type": "file",
+                "children": []
+              }
+            ]
+          },
+          {
             "name": "cloud_functions",
             "path": "pages/services/cloud_functions",
             "type": "dir",
@@ -408,37 +439,6 @@
         "name": "new_updates",
         "type": "category",
         "children": []
-      },
-      {
-        "name": "realtime_",
-        "path": "pages/services/realtime_",
-        "type": "dir",
-        "children": [
-          {
-            "name": "overview.md",
-            "path": "pages/services/realtime_/overview.md",
-            "type": "file",
-            "children": []
-          },
-          {
-            "name": "additional.md",
-            "path": "pages/services/realtime_/additional.md",
-            "type": "file",
-            "children": []
-          },
-          {
-            "name": "read_data.md",
-            "path": "pages/services/realtime_/read_data.md",
-            "type": "file",
-            "children": []
-          },
-          {
-            "name": "write_data.md",
-            "path": "pages/services/realtime_/write_data.md",
-            "type": "file",
-            "children": []
-          }
-        ]
       }
     ]
   },
