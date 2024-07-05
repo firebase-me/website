@@ -170,7 +170,7 @@ We support several generated parameters (and comments)
         return result;
     }
 function generateCrypto(params) {
-    if (params === 'UUID') {
+    if (params === 'UUID' || params === '') {
         if (typeof window.crypto === 'undefined') {
             showNotification('Crypto API not supported', 'red');
             return 'crypto-not-supported-' + generateRandomString(32);
