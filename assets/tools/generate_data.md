@@ -18,10 +18,16 @@ We support several generated parameters (and comments)
 > 100 = true
 > empty/default = false
 
+> **$crypto(N)**
+> N = length of crypto hash OR flag
+> supported flags: UUID
+> empty/default = 32 length string
+
 <textarea id="json-input" placeholder="Enter JSON object here" rows="10" cols="50">{
-    "id": "$number(5)",
+    // this is an example JSON (with comments)
+    "id": "_id.$number(5)",
     "name": "$string(10)",
-    "age": "$number(20-50)",
+    "age": "$number(20-50).$number(1-12)",
     "isActive": "$bool(70)",
     "address": {
         "street": "$string(15)",
@@ -54,7 +60,6 @@ We support several generated parameters (and comments)
     <button id="copy-button" class="button-styled">Copy</button>
     <button id="download-button" class="button-styled">Download</button>
 </div>
-
 
 <script>
     function showNotification(message, color) {
@@ -106,8 +111,6 @@ We support several generated parameters (and comments)
         const outputContainer = document.getElementById('output-container');
         const outputElement = outputContainer.querySelector('pre.code-output');
         outputElement.textContent = output;
-        console.log('Output Element:', outputElement);
-        console.log('Generated Output:', output);
     }
 
     function processObject(obj) {
@@ -128,17 +131,10 @@ We support several generated parameters (and comments)
 
     function processValue(value) {
         if (typeof value === 'string') {
-            const numberMatch = value.match(/^\$number\(([^)]*)\)$/);
-            const boolMatch = value.match(/^\$bool\(([^)]*)\)$/);
-            const stringMatch = value.match(/^\$string\(([^)]*)\)$/);
-
-            if (numberMatch) {
-                return generateNumber(numberMatch[1]);
-            } else if (boolMatch) {
-                return generateBool(boolMatch[1]);
-            } else if (stringMatch) {
-                return generateString(stringMatch[1]);
-            }
+            value = value.replace(/\$number\(([^)]*)\)/g, (match, params) => generateNumber(params));
+            value = value.replace(/\$bool\(([^)]*)\)/g, (match, params) => generateBool(params));
+            value = value.replace(/\$string\(([^)]*)\)/g, (match, params) => generateString(params));
+            value = value.replace(/\$crypto\(([^)]*)\)/g, (match, params) => generateCrypto(params));
         } else if (Array.isArray(value)) {
             return value.map(item => processValue(item));
         } else if (typeof value === 'object' && value !== null) {
@@ -146,18 +142,18 @@ We support several generated parameters (and comments)
         }
         return value;
     }
-    
-function generateNumber(params) {
-    if (params.includes('-')) {
-        const [min, max] = params.split('-').map(Number).sort((a, b) => a - b);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    } else if (!isNaN(params) && params.length > 0) {
-        const length = Number(params);
-        return Math.floor(Math.random() * Math.pow(10, length));
-    } else {
-        return 0;
+
+    function generateNumber(params) {
+        if (params.includes('-')) {
+            const [min, max] = params.split('-').map(Number).sort((a, b) => a - b);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        } else if (!isNaN(params) && params.length > 0) {
+            const length = Number(params);
+            return Math.floor(Math.random() * Math.pow(10, length));
+        } else {
+            return 0;
+        }
     }
-}
 
     function generateBool(params) {
         const probability = Number(params);
@@ -173,6 +169,34 @@ function generateNumber(params) {
         }
         return result;
     }
+function generateCrypto(params) {
+    if (params === 'UUID') {
+        if (typeof window.crypto === 'undefined') {
+            showNotification('Crypto API not supported', 'red');
+            return 'crypto-not-supported-' + generateRandomString(32);
+        }
+        return crypto.randomUUID();
+    }
+
+    const length = parseInt(params, 10);
+    if (isNaN(length)) {
+        showNotification('Invalid length for crypto generation', 'red');
+        return 'crypto-not-supported-' + generateRandomString(32);
+    }
+
+    return generateRandomString(length);
+}
+
+function generateRandomString(length) {
+    const array = new Uint8Array(length);
+    crypto.getRandomValues(array);
+    return arrayToBase64(array).slice(0, length);
+}
+
+function arrayToBase64(array) {
+    const binaryString = String.fromCharCode.apply(null, array);
+    return btoa(binaryString);
+}
 
     function copyToClipboard() {
         const outputContainer = document.getElementById('output-container');
