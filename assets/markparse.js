@@ -124,7 +124,19 @@ function renderMarkdown(input, url, update) {
         }
     });
 
-    container.innerHTML = marked.parse(finalText.join('\n'));
+    // FIXME: is this good?
+    // container.innerHTML = marked.parse(finalText.join('\n'));
+    container.innerHTML = marked.parse(finalText.join('\n'))
+    .replace(/<blockquote>((?:.|\n)*?)<\/blockquote>/g, function (match, content) {
+        return '<blockquote>' + content.trim().replace(/\n/g, '<br>') + '</blockquote>';
+    });
+
+    // Execute embedded scripts
+    container.querySelectorAll('script').forEach(script => {
+        const newScript = document.createElement('script');
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    });
 
     // Ensure default images are not centered
     container.querySelectorAll('img').forEach(img => {

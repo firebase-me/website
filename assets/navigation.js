@@ -5,6 +5,7 @@ function goto(dest, stub = false) {
         if (dest == '/' || dest == 'home')
             dest = 'index.html'
     }
+    
 
     let loc = dest.startsWith('pages/') ? dest.match(/pages\/(.+)\.md/)[1] : dest
     if (!loc.startsWith('/')) {
