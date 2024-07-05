@@ -146,17 +146,18 @@ We support several generated parameters (and comments)
         }
         return value;
     }
-
-    function generateNumber(params) {
-        if (params.includes('-')) {
-            const [min, max] = params.split('-').map(Number);
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        } else if (params.length > 0) {
-            return Math.floor(Math.random() * Math.pow(10, params.length));
-        } else {
-            return 0;
-        }
+    
+function generateNumber(params) {
+    if (params.includes('-')) {
+        const [min, max] = params.split('-').map(Number).sort((a, b) => a - b);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    } else if (!isNaN(params) && params.length > 0) {
+        const length = Number(params);
+        return Math.floor(Math.random() * Math.pow(10, length));
+    } else {
+        return 0;
     }
+}
 
     function generateBool(params) {
         const probability = Number(params);
