@@ -629,6 +629,19 @@
         ]
       },
       {
+        "name": "unity",
+        "path": "pages/tutorials/unity",
+        "type": "dir",
+        "children": [
+          {
+            "name": "common-issues.md",
+            "path": "pages/tutorials/unity/common-issues.md",
+            "type": "file",
+            "children": []
+          }
+        ]
+      },
+      {
         "name": "vue",
         "path": "pages/tutorials/vue",
         "type": "dir",
