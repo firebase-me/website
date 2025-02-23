@@ -4,7 +4,7 @@ The `onDisconnect` feature in Firebase Realtime Database allows you to specify w
 
 - **Purging a user from a queue** when they leave.
 - **Writing an offline state** to indicate that a user is no longer active.
-- **Signaling to other services** that a user has disconnected.
+- **Signaling to external services** (e.g., a shopping cart service) that a user has disconnected.
 
 This guide explains how `onDisconnect` works, its use cases, and important considerations to keep in mind when implementing it.
 
@@ -52,19 +52,19 @@ userRef.onDisconnect().remove();
 ```
 
 ### 2. **Writing Offline State**
-You can update a user's status to "offline" when they disconnect:
+You can update a user's status to "offline" when they disconnect. This is useful for tracking user presence in real-time applications:
 
 ```javascript
 const statusRef = firebase.database().ref(`status/${userId}`);
 statusRef.onDisconnect().set("offline");
 ```
 
-### 3. **Signaling User Disconnection**
-Use `onDisconnect` to notify other services or clients that a user has left:
+### 3. **Signaling to External Services**
+You can use `onDisconnect` to notify external services (e.g., a shopping cart service) that a user has left. For example, you might clear a user's shopping cart or log their disconnection time:
 
 ```javascript
-const presenceRef = firebase.database().ref(`presence/${userId}`);
-presenceRef.onDisconnect().update({ isOnline: false });
+const cartRef = firebase.database().ref(`carts/${userId}`);
+cartRef.onDisconnect().update({ status: "abandoned", lastActive: firebase.database.ServerValue.TIMESTAMP });
 ```
 
 ---
@@ -87,7 +87,3 @@ If your `onDisconnect` operation is not working as expected:
 - **Test for Edge Cases**: Simulate network failures and abrupt disconnections to ensure your `onDisconnect` logic works as expected.
 - **Use Security Rules Wisely**: Ensure your Firebase Security Rules are configured to allow `onDisconnect` operations while maintaining data integrity.
 - **Monitor Logs**: Regularly check the Firebase Console logs for errors related to `onDisconnect` operations.
-
----
-
-By understanding and implementing `onDisconnect` effectively, you can ensure that your Firebase Realtime Database remains consistent and reliable, even when clients disconnect unexpectedly.
