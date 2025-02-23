@@ -137,6 +137,12 @@
                 "children": []
               },
               {
+                "name": "on_disconnect.md",
+                "path": "pages/services/realtime_db/on_disconnect.md",
+                "type": "file",
+                "children": []
+              },
+              {
                 "name": "read_data.md",
                 "path": "pages/services/realtime_db/read_data.md",
                 "type": "file",
